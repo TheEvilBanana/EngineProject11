@@ -78,5 +78,15 @@ private:
 	
 	DirectionalLight dirLight1;
 	DirectionalLight dirLight2;
+
+	//Sky stuff
+	ID3D11ShaderResourceView* skySRV;
+	SimpleVertexShader* skyVS;
+	SimplePixelShader* skyPS;
+	ID3D11RasterizerState* rsSky;
+	ID3D11DepthStencilState* dsSky;
+
+	Mesh* cubeMesh;
+	GameEntity* cubeEntity;
 };
 

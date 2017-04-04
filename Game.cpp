@@ -1,6 +1,7 @@
 #include "Game.h"
 #include "Vertex.h"
 #include "WICTextureLoader.h"
+#include "DDSTextureLoader.h"
 
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
@@ -65,6 +66,13 @@ Game::~Game()
 	sampler1->Release();
 //	sampler2->Release();
 	//sampler1->Release();
+
+	skySRV->Release();
+	rsSky->Release();
+	dsSky->Release();
+
+	delete skyVS;
+	delete skyPS;
 }
 
 // --------------------------------------------------------
@@ -86,6 +94,23 @@ void Game::Init()
 	btBoxShape* box = new btBoxShape(btVector3(1, 1, 1)); 
 	/************************************************************/
 	//CreateWICTextureFromFile(device, context, L"Debug/Flames.jpg", 0, &flamesSRV);
+	CreateDDSTextureFromFile(device, L"Debug/TextureFiles/SunnyCubeMap.dds", 0, &skySRV);
+
+	//Setting the sky stuff
+
+	//Set up the rasterize state
+	D3D11_RASTERIZER_DESC rsDesc = {};
+	rsDesc.FillMode = D3D11_FILL_SOLID;
+	rsDesc.CullMode = D3D11_CULL_FRONT;
+	rsDesc.DepthClipEnable = true;
+	device->CreateRasterizerState(&rsDesc, &rsSky);
+
+	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+	dsDesc.DepthEnable = true;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	device->CreateDepthStencilState(&dsDesc, &dsSky);
+
 
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
@@ -108,7 +133,14 @@ void Game::LoadShaders()
 	pixelShader = new SimplePixelShader(device, context);
 	if(!pixelShader->LoadShaderFile(L"Debug/PixelShader.cso"))	
 		pixelShader->LoadShaderFile(L"PixelShader.cso");
-	
+	skyVS = new SimpleVertexShader(device, context);
+	if (!skyVS->LoadShaderFile(L"Debug/SkyVS.cso"))
+		skyVS->LoadShaderFile(L"SkyVS.cso");
+
+	skyPS = new SimplePixelShader(device, context);
+	if (!skyPS->LoadShaderFile(L"Debug/SkyPS.cso"))
+		skyPS->LoadShaderFile(L"SkyPS.cso");
+
 	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/Cobble.tif", 0, &flamesSRV);
 	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/Carpet.jpg", 0, &carpetSRV);
 
@@ -159,6 +191,15 @@ void Game::CreateBasicGeometry()
 
 	GameEntity* sphere = new GameEntity(sphereMesh, material1);
 	entities.push_back(sphere);
+
+	cubeMesh=new Mesh("Debug/Models/cube.obj", device);
+	meshes.push_back(cubeMesh);
+
+	cubeEntity = new GameEntity(cubeMesh, material2);
+	entities.push_back(cubeEntity);
+
+
+
 
 
 }
@@ -250,7 +291,27 @@ void Game::Draw(float deltaTime, float totalTime)
 	// Finally do the actual drawing
 	context->DrawIndexed(entities[0]->GetMesh()->GetIndexCount(), 0, 0);
 
-	
+	//Draw the sky
+	vertexBuffer = meshes[1]->GetVertexBuffer();
+	indexBuffer = meshes[1]->GetIndexBuffer();
+
+	//Set the buffers in the input assembler
+	context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+	context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+	//Set up the sky shaders
+	skyVS->SetMatrix4x4("view", camera->GetView());
+	skyVS->SetMatrix4x4("projection", camera->GetProjection());
+	skyVS->CopyAllBufferData();
+	skyVS->SetShader();
+
+	skyPS->SetShaderResourceView("Sky", skySRV);
+	skyPS->CopyAllBufferData();
+	skyPS->SetShader();
+
+	context->RSSetState(rsSky);
+	context->OMSetDepthStencilState(dsSky, 0);
+	context->DrawIndexed(meshes[1]->GetIndexCount(), 0, 0);
 
 	swapChain->Present(0, 0);
 	
