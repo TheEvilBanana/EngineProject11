@@ -3,6 +3,9 @@
 #include <WindowsX.h>
 #include <sstream>
 
+#include <parallel_invoke.h>
+
+
 // Define the static instance variable so our OS-level 
 // message handling function below can talk to our object
 DXCore* DXCore::DXCoreInstance = 0;
@@ -334,6 +337,25 @@ void DXCore::OnResize()
 	context->RSSetViewports(1, &viewport);
 }
 
+void DXCore::testtbb1()
+{
+	printf("hello");
+}
+
+void DXCore::testtbb2()
+{
+	printf("world");
+}
+
+//void testtbb1()
+//{
+//	printf("hello");
+//}
+//
+//void testtbb2()
+//{
+//	printf("world");
+//}
 
 // --------------------------------------------------------
 // This is the main game loop, handling the following:
@@ -375,6 +397,16 @@ HRESULT DXCore::Run()
 			// The game loop
 			Update(deltaTime, totalTime);
 			Draw(deltaTime, totalTime);
+
+			
+
+			/*tbb::parallel_invoke(
+
+				[&]() { testtbb1(); },
+
+				[&]() { testtbb2(); }
+
+			);*/
 		}
 	}
 
