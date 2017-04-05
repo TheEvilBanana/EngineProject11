@@ -3,8 +3,7 @@
 #include "WICTextureLoader.h"
 #include "DDSTextureLoader.h"
 
-#include "btBulletCollisionCommon.h"
-#include "btBulletDynamicsCommon.h"
+
 // For the DirectX Math library
 using namespace DirectX;
 
@@ -56,6 +55,8 @@ Game::~Game()
 	delete pixelShader;
 	delete material1;
 	//delete material2;
+	delete skyVS;
+	delete skyPS;
 
 	for (auto& e : entities) delete e;
 	for (auto& m : meshes) delete m;
@@ -64,15 +65,14 @@ Game::~Game()
 	flamesSRV->Release();
 	carpetSRV->Release();
 	sampler1->Release();
-//	sampler2->Release();
+    //sampler2->Release();
 	//sampler1->Release();
 
 	skySRV->Release();
 	rsSky->Release();
 	dsSky->Release();
 
-	delete skyVS;
-	delete skyPS;
+	
 }
 
 // --------------------------------------------------------
@@ -91,7 +91,23 @@ void Game::Init()
 	dirLight2.SetLightValues(XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(-1.0f, -1.0f, 0));
 	
 	/*********Trial Bullet*******/
-	btBoxShape* box = new btBoxShape(btVector3(1, 1, 1)); 
+	//btBoxShape* box = new btBoxShape(btVector3(1, 1, 1)); 
+	collisionConfig = new btDefaultCollisionConfiguration();
+	dispatcher = new btCollisionDispatcher(collisionConfig);
+	broadphase = new btDbvtBroadphase();
+	solver = new btSequentialImpulseConstraintSolver();
+
+	world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfig);
+	world->setGravity(btVector3(0, -10, 0));
+	
+	btTransform t;
+	t.setIdentity();
+	t.setOrigin(btVector3(0, 0, 0));
+	btStaticPlaneShape* plane = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
+	btMotionState* motion = new btDefaultMotionState(t);
+	btRigidBody::btRigidBodyConstructionInfo info(0.0, motion, plane);
+	btRigidBody* body = new btRigidBody(info);
+	world->addRigidBody(body);
 	/************************************************************/
 	//CreateWICTextureFromFile(device, context, L"Debug/Flames.jpg", 0, &flamesSRV);
 	CreateDDSTextureFromFile(device, L"Debug/TextureFiles/SunnyCubeMap.dds", 0, &skySRV);
@@ -229,10 +245,10 @@ void Game::OnResize()
 void Game::Update(float deltaTime, float totalTime)
 {
 	float sinTime = (sin(totalTime * 2) + 2.0f) / 10.0f;
-	
+	world->stepSimulation(deltaTime);
 	// Update the camera
 	camera->Update(deltaTime);
-
+	
 	entities[0]->UpdateWorldMatrix();
 
 	// Quit if the escape key is pressed

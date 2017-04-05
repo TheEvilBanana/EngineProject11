@@ -7,6 +7,8 @@
 #include "GameEntity.h"
 #include "Camera.h"
 #include "Lights.h"
+#include "btBulletCollisionCommon.h"
+#include "btBulletDynamicsCommon.h"
 #include <vector>
 
 
@@ -88,5 +90,13 @@ private:
 
 	Mesh* cubeMesh;
 	GameEntity* cubeEntity;
+
+	//bulletstuff
+	btDynamicsWorld* world;
+	btDispatcher* dispatcher;
+	btCollisionConfiguration* collisionConfig;
+	btBroadphaseInterface* broadphase;
+	btConstraintSolver* solver;
+
 };
 
