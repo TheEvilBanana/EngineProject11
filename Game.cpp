@@ -107,31 +107,31 @@ void Game::Init()
 	
 	/*********Trial Bullet*******/
 	//btBoxShape* box = new btBoxShape(btVector3(1, 1, 1)); 
-	collisionConfig = new btDefaultCollisionConfiguration();
-	dispatcher = new btCollisionDispatcher(collisionConfig);
-	broadphase = new btDbvtBroadphase();
-	solver = new btSequentialImpulseConstraintSolver();
+	collisionConfig = new btDefaultCollisionConfiguration();      // Setting the collision properties to default
+	dispatcher = new btCollisionDispatcher(collisionConfig);      // Supports Algorithm that handle different collision types
+	broadphase = new btDbvtBroadphase();                          // Collision detection algorithm i.e way of looping through objects to check collisions
+	solver = new btSequentialImpulseConstraintSolver();           // Calculates everything i.e force, speed etc on collision
 
-	world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfig);
-	world->setGravity(btVector3(0, -5, 0));
+	world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfig);  // Create world using the above 4 properties
+	world->setGravity(btVector3(0, -5, 0));                                                // Setting world gravity
 	
-	btTransform planeTransform;
-	planeTransform.setIdentity();
-	planeTransform.setOrigin(btVector3(0, 0, 0));
-	plane = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
-	planeMotion = new btDefaultMotionState(planeTransform);
-	btRigidBody::btRigidBodyConstructionInfo infoPlane(0.0, planeMotion, plane);
-	planeBody = new btRigidBody(infoPlane);
-	world->addRigidBody(planeBody);
+	btTransform planeTransform;                                                         // Initiate transform
+	planeTransform.setIdentity();                                                       // Setup transform
+	planeTransform.setOrigin(btVector3(0, 0, 0));                                       // Set starting position
+	plane = new btStaticPlaneShape(btVector3(0, 1, 0), 0);                              // Set the rigid body shape [plane], apply given transform
+	planeMotion = new btDefaultMotionState(planeTransform);                             // Set up body motion, but this is static so no matter
+	btRigidBody::btRigidBodyConstructionInfo infoPlane(0.0, planeMotion, plane);        // Set the info for the rigid body
+	planeBody = new btRigidBody(infoPlane);                                             // Initiate the rigid body
+	world->addRigidBody(planeBody);                                                     // Add body to world
 
-	btTransform sphereTransform;
+	btTransform sphereTransform;                                                         // Same stuff for sphere as above
 	sphereTransform.setIdentity();
 	sphereTransform.setOrigin(btVector3(0, 10, 0));
 	sphere = new btSphereShape(1);
 	sphereMotion = new btDefaultMotionState(sphereTransform);
 	btVector3 inertiaSphere;
 	sphere->calculateLocalInertia(1.0, inertiaSphere);
-	btRigidBody::btRigidBodyConstructionInfo infoSphere(1.0, sphereMotion, sphere, inertiaSphere);
+	btRigidBody::btRigidBodyConstructionInfo infoSphere(1.0, sphereMotion, sphere, inertiaSphere);  // Setting inertia here cause its not static,i.e, dynamic cause it has mass
 	sphereBody = new btRigidBody(infoSphere);
 	world->addRigidBody(sphereBody);
 
@@ -280,7 +280,7 @@ void Game::Update(float deltaTime, float totalTime)
 	world->stepSimulation(deltaTime);
 	btTransform sphereSpace;
 	sphereBody->getMotionState()->getWorldTransform(sphereSpace);
-	//btVector3 spherePos = (sphereSpace.getOrigin().x)
+	
 	entities[0]->SetPosition(sphereSpace.getOrigin().x(), sphereSpace.getOrigin().y(), sphereSpace.getOrigin().z());
 	
 	tbb::parallel_invoke(
@@ -288,12 +288,12 @@ void Game::Update(float deltaTime, float totalTime)
 		[&]() { entities[0]->UpdateWorldMatrix(); },
 		[]() {printf("Hello World"); }
 	);
-	entities[1]->UpdateWorldMatrix();
+	
 	// Update the camera
-	//camera->Update(deltaTime);
+	/*camera->Update(deltaTime);
 
-	//entities[0]->UpdateWorldMatrix();
-
+	entities[0]->UpdateWorldMatrix();*/
+	entities[1]->UpdateWorldMatrix();
 
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
