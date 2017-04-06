@@ -4,6 +4,11 @@
 #include "DDSTextureLoader.h"
 
 
+#include "btBulletCollisionCommon.h"
+#include "btBulletDynamicsCommon.h"
+#include <parallel_invoke.h>
+
+
 // For the DirectX Math library
 using namespace DirectX;
 
@@ -245,11 +250,25 @@ void Game::OnResize()
 void Game::Update(float deltaTime, float totalTime)
 {
 	float sinTime = (sin(totalTime * 2) + 2.0f) / 10.0f;
+
 	world->stepSimulation(deltaTime);
 	// Update the camera
 	camera->Update(deltaTime);
 	
 	entities[0]->UpdateWorldMatrix();
+
+	
+	tbb::parallel_invoke(
+		[&]() { camera->Update(deltaTime); },
+		[&]() { entities[0]->UpdateWorldMatrix(); },
+		[]() {printf("Hello World"); }
+	);
+
+	// Update the camera
+	//camera->Update(deltaTime);
+
+	//entities[0]->UpdateWorldMatrix();
+
 
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
@@ -332,6 +351,13 @@ void Game::Draw(float deltaTime, float totalTime)
 	swapChain->Present(0, 0);
 	
 }
+
+void Game::Print()
+{
+	printf("Hello World");
+}
+
+
 
 
 #pragma region Mouse Input
