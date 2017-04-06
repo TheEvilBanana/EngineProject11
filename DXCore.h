@@ -50,8 +50,8 @@ public:
 	virtual void OnMouseMove (WPARAM buttonState, int x, int y) { }
 	virtual void OnMouseWheel(float wheelDelta,   int x, int y) { }
 
-	void testtbb1();
-	void testtbb2();
+	/*void testtbb1();
+	void testtbb2();*/
 	
 protected:
 	HINSTANCE	hInstance;		// The handle to the application

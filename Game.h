@@ -72,13 +72,19 @@ private:
 	
 	Mesh *entityMesh1;
 	Mesh *entityMesh2;
+	Mesh* sphereMesh;
+	Mesh* cubeMesh;
+	Mesh* planeMesh;
 
 	Material *material1;
 	Material *material2;
 	
 	GameEntity *entity1;
 	GameEntity *entity2;
-	
+	GameEntity* sphereEntity;
+	GameEntity* cubeEntity;
+	GameEntity* planeEntity;
+
 	DirectionalLight dirLight1;
 	DirectionalLight dirLight2;
 
@@ -89,8 +95,8 @@ private:
 	ID3D11RasterizerState* rsSky;
 	ID3D11DepthStencilState* dsSky;
 
-	Mesh* cubeMesh;
-	GameEntity* cubeEntity;
+	
+	
 
 	//bulletstuff
 	btDynamicsWorld* world;
@@ -98,6 +104,13 @@ private:
 	btCollisionConfiguration* collisionConfig;
 	btBroadphaseInterface* broadphase;
 	btConstraintSolver* solver;
+	btRigidBody* planeBody;
+	btRigidBody* sphereBody;
+	btStaticPlaneShape* plane;
+	btMotionState* planeMotion;
+	btSphereShape* sphere;
+	btMotionState* sphereMotion;
+
 
 };
 

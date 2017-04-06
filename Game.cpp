@@ -77,7 +77,17 @@ Game::~Game()
 	rsSky->Release();
 	dsSky->Release();
 
-	
+	delete world;
+	delete collisionConfig;
+	delete dispatcher;
+	delete broadphase;
+	delete solver;
+	delete planeBody;
+	delete sphereBody;
+	delete plane;
+	delete planeMotion;
+	delete sphere;
+	delete sphereMotion;
 }
 
 // --------------------------------------------------------
@@ -103,16 +113,30 @@ void Game::Init()
 	solver = new btSequentialImpulseConstraintSolver();
 
 	world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfig);
-	world->setGravity(btVector3(0, -10, 0));
+	world->setGravity(btVector3(0, -5, 0));
 	
-	btTransform t;
-	t.setIdentity();
-	t.setOrigin(btVector3(0, 0, 0));
-	btStaticPlaneShape* plane = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
-	btMotionState* motion = new btDefaultMotionState(t);
-	btRigidBody::btRigidBodyConstructionInfo info(0.0, motion, plane);
-	btRigidBody* body = new btRigidBody(info);
-	world->addRigidBody(body);
+	btTransform planeTransform;
+	planeTransform.setIdentity();
+	planeTransform.setOrigin(btVector3(0, 0, 0));
+	plane = new btStaticPlaneShape(btVector3(0, 1, 0), 0);
+	planeMotion = new btDefaultMotionState(planeTransform);
+	btRigidBody::btRigidBodyConstructionInfo infoPlane(0.0, planeMotion, plane);
+	planeBody = new btRigidBody(infoPlane);
+	world->addRigidBody(planeBody);
+
+	btTransform sphereTransform;
+	sphereTransform.setIdentity();
+	sphereTransform.setOrigin(btVector3(0, 10, 0));
+	sphere = new btSphereShape(1);
+	sphereMotion = new btDefaultMotionState(sphereTransform);
+	btVector3 inertiaSphere;
+	sphere->calculateLocalInertia(1.0, inertiaSphere);
+	btRigidBody::btRigidBodyConstructionInfo infoSphere(1.0, sphereMotion, sphere, inertiaSphere);
+	sphereBody = new btRigidBody(infoSphere);
+	world->addRigidBody(sphereBody);
+
+
+	
 	/************************************************************/
 	//CreateWICTextureFromFile(device, context, L"Debug/Flames.jpg", 0, &flamesSRV);
 	CreateDDSTextureFromFile(device, L"Debug/TextureFiles/SunnyCubeMap.dds", 0, &skySRV);
@@ -132,7 +156,7 @@ void Game::Init()
 	dsDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
 	device->CreateDepthStencilState(&dsDesc, &dsSky);
 
-
+	
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
 	// Essentially: "What kind of shape should the GPU draw with our data?"
@@ -196,7 +220,7 @@ void Game::LoadShaders()
 // --------------------------------------------------------
 void Game::CreateMatrices()
 {
-	camera = new Camera(0, 0, -5);
+	camera = new Camera(0, 6, -15);
 	camera->UpdateProjectionMatrix((float) width / height);
 
 }
@@ -207,22 +231,24 @@ void Game::CreateMatrices()
 // --------------------------------------------------------
 void Game::CreateBasicGeometry()
 {
-	Mesh* sphereMesh = new Mesh("Debug/Models/sphere.obj", device);
+	sphereMesh = new Mesh("Debug/Models/sphere.obj", device);
 	meshes.push_back(sphereMesh);
 
-	GameEntity* sphere = new GameEntity(sphereMesh, material1);
-	entities.push_back(sphere);
+	sphereEntity = new GameEntity(sphereMesh, material1);
+	entities.push_back(sphereEntity);
 
-	cubeMesh=new Mesh("Debug/Models/cube.obj", device);
+	planeMesh = new Mesh("Debug/Models/cube.obj", device);
+	meshes.push_back(planeMesh);
+	planeEntity = new GameEntity(planeMesh, material1);
+	entities.push_back(planeEntity);
+
+	cubeMesh = new Mesh("Debug/Models/cube.obj", device);
 	meshes.push_back(cubeMesh);
 
 	cubeEntity = new GameEntity(cubeMesh, material2);
 	entities.push_back(cubeEntity);
 
-
-
-
-
+	entities[1]->SetScale(8.0f, 0.1f, 8.0f);
 }
 
 
@@ -250,20 +276,19 @@ void Game::OnResize()
 void Game::Update(float deltaTime, float totalTime)
 {
 	float sinTime = (sin(totalTime * 2) + 2.0f) / 10.0f;
-
-	world->stepSimulation(deltaTime);
-	// Update the camera
-	camera->Update(deltaTime);
 	
-	entities[0]->UpdateWorldMatrix();
-
+	world->stepSimulation(deltaTime);
+	btTransform sphereSpace;
+	sphereBody->getMotionState()->getWorldTransform(sphereSpace);
+	//btVector3 spherePos = (sphereSpace.getOrigin().x)
+	entities[0]->SetPosition(sphereSpace.getOrigin().x(), sphereSpace.getOrigin().y(), sphereSpace.getOrigin().z());
 	
 	tbb::parallel_invoke(
 		[&]() { camera->Update(deltaTime); },
 		[&]() { entities[0]->UpdateWorldMatrix(); },
 		[]() {printf("Hello World"); }
 	);
-
+	entities[1]->UpdateWorldMatrix();
 	// Update the camera
 	//camera->Update(deltaTime);
 
@@ -294,15 +319,14 @@ void Game::Draw(float deltaTime, float totalTime)
 		D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
 		1.0f,
 		0);
-	
-	vertexBuffer = entities[0]->GetMesh()->GetVertexBuffer();
-	indexBuffer = entities[0]->GetMesh()->GetIndexBuffer();
+	UINT stride = sizeof(Vertex);
+	UINT offset = 0;
 
 	// Set buffers in the input assembler
 	//  - Do this ONCE PER OBJECT you're drawing, since each object might
 	//    have different geometry.
-	UINT stride = sizeof(Vertex);
-	UINT offset = 0;
+	vertexBuffer = entities[0]->GetMesh()->GetVertexBuffer();
+	indexBuffer = entities[0]->GetMesh()->GetIndexBuffer();
 	
 	context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
 	context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
@@ -326,9 +350,35 @@ void Game::Draw(float deltaTime, float totalTime)
 	// Finally do the actual drawing
 	context->DrawIndexed(entities[0]->GetMesh()->GetIndexCount(), 0, 0);
 
+
+	//Draw the plane
+	vertexBuffer = entities[1]->GetMesh()->GetVertexBuffer();
+	indexBuffer = entities[1]->GetMesh()->GetIndexBuffer();
+
+	context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+	context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+	vertexShader->SetMatrix4x4("world", *entities[1]->GetWorldMatrix());
+	vertexShader->SetMatrix4x4("view", camera->GetView());
+	vertexShader->SetMatrix4x4("projection", camera->GetProjection());
+
+	vertexShader->CopyAllBufferData();
+	vertexShader->SetShader();
+
+	pixelShader->SetData("light1", &dirLight1, sizeof(DirectionalLight));
+	pixelShader->SetData("light2", &dirLight2, sizeof(DirectionalLight));
+
+	pixelShader->SetShaderResourceView("textureSRV", carpetSRV);
+	pixelShader->SetSamplerState("basicSampler", sampler1);
+
+	pixelShader->CopyAllBufferData();
+	pixelShader->SetShader();
+
+	context->DrawIndexed(entities[1]->GetMesh()->GetIndexCount(), 0, 0);
+
 	//Draw the sky
-	vertexBuffer = meshes[1]->GetVertexBuffer();
-	indexBuffer = meshes[1]->GetIndexBuffer();
+	vertexBuffer = entities[2]->GetMesh()->GetVertexBuffer();
+	indexBuffer = entities[2]->GetMesh()->GetIndexBuffer();
 
 	//Set the buffers in the input assembler
 	context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
@@ -346,7 +396,7 @@ void Game::Draw(float deltaTime, float totalTime)
 
 	context->RSSetState(rsSky);
 	context->OMSetDepthStencilState(dsSky, 0);
-	context->DrawIndexed(meshes[1]->GetIndexCount(), 0, 0);
+	context->DrawIndexed(entities[2]->GetMesh()->GetIndexCount(), 0, 0);
 
 	swapChain->Present(0, 0);
 	

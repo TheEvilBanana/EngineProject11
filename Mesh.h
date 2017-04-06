@@ -5,7 +5,7 @@
 
 class Mesh {
 public:
-	Mesh(Vertex* vertices, int numVertex, unsigned int* indices, int numIndex, ID3D11Device *device);
+	Mesh(NotObjShapes vertices[], int numVertex, int indices[], int numIndex, ID3D11Device *device);
 	Mesh(const char* objFile, ID3D11Device *device);
 	~Mesh();
 	
@@ -22,6 +22,6 @@ private:
 	int indices1;
 
 	void CreateBuffers(Vertex *vertices, int numVertex, unsigned int *indices, int numIndex, ID3D11Device *device);
-	
+	void CreateBuffers(NotObjShapes vertices[], int numVertex, int indices[], int numIndex, ID3D11Device *device);
 };
 

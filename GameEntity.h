@@ -11,21 +11,7 @@ class GameEntity {
 public:
 	GameEntity(Mesh *entityMesh, Material *entityMaterial);
 	~GameEntity();
-	/*ID3D11Buffer* GetEntityVertexBuffer();
-	ID3D11Buffer* GetEntityIndexBuffer();
-	int GetEntityIndexCount();
-	XMFLOAT4X4 worldMatrix;
-	void setEntityPosition(float x, float y, float z);
-	void setEntityRotate(float rotate);
-	void setEntityScale(float x, float y, float z);
-	void animate();
-	void PrepareMaterial(XMFLOAT4X4 viewMatrix, XMFLOAT4X4 projectionMatrix);
-	void SetPixelShader(SimplePixelShader *_pixelShader);
-	void SetVertexShader(SimpleVertexShader *_vertexShader);
-	void SetEntitySRV(ID3D11ShaderResourceView* _entitySRV);
-	void SetEntitySampler(ID3D11SamplerState* _entitySampler);*/
-	/*SimplePixelShader* pixelShader;
-	SimpleVertexShader* vertexShader;*/
+	
 
 	void UpdateWorldMatrix();
 
@@ -42,18 +28,6 @@ public:
 
 private:
 	
-	/*XMFLOAT4X4 entityPosition;
-	XMFLOAT4X4 entityRotation;
-	XMFLOAT4X4 entityScale;
-	ID3D11Buffer *entityVertexBufferMesh;
-	ID3D11Buffer *entityIndexBufferMesh;
-	int entityIndices1;
-	SimplePixelShader* pixelShader;
-	SimpleVertexShader* vertexShader;
-	ID3D11ShaderResourceView* entitySRV;
-	ID3D11SamplerState* entitySampler;*/
-	//XMFLOAT4X4 viewMatrix;
-	//XMFLOAT4X4 projectionMatrix;
 
 	Mesh* mesh;
 	Material* material;

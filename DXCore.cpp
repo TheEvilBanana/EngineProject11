@@ -337,15 +337,15 @@ void DXCore::OnResize()
 	context->RSSetViewports(1, &viewport);
 }
 
-void DXCore::testtbb1()
-{
-	printf("hello");
-}
-
-void DXCore::testtbb2()
-{
-	printf("world");
-}
+//void DXCore::testtbb1()
+//{
+//	printf("hello");
+//}
+//
+//void DXCore::testtbb2()
+//{
+//	printf("world");
+//}
 
 //void testtbb1()
 //{
