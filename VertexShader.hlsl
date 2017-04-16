@@ -18,16 +18,17 @@ cbuffer externalData : register(b0)
 // - The name of the struct itself is unimportant, but should be descriptive
 // - Each variable must have a semantic, which defines its usage
 struct VertexShaderInput
-{ 
+{
 	// Data type
 	//  |
 	//  |   Name          Semantic
 	//  |    |                |
 	//  v    v                v
 	float3 position		: POSITION;     // XYZ position
-	//float4 color		: COLOR;        // RGBA color
+										//float4 color		: COLOR;        // RGBA color
 	float3 normal       : NORMAL;       // Normal co-ordinates
 	float2 uv           : TEXCOORD;     // UV co-ordinates
+	float3 tangent		: TANGENT;
 };
 
 // Struct representing the data we're sending down the pipeline
@@ -43,9 +44,11 @@ struct VertexToPixel
 	//  |    |                |
 	//  v    v                v
 	float4 position		: SV_POSITION;	// XYZW position (System Value Position)
-	//float4 color		: COLOR;        // RGBA color
+										//float4 color		: COLOR;        // RGBA color
 	float3 normal       : NORMAL;       // Normal co-ordinates
 	float2 uv           : TEXCOORD;     // UV co-ordinates
+	float3 tangent		: TANGENT;
+	float3 worldPos		: POSITION;
 };
 
 // --------------------------------------------------------
@@ -55,7 +58,7 @@ struct VertexToPixel
 // - Output is a single struct of data to pass down the pipeline
 // - Named "main" because that's the default the shader compiler looks for
 // --------------------------------------------------------
-VertexToPixel main( VertexShaderInput input )
+VertexToPixel main(VertexShaderInput input)
 {
 	// Set up output struct
 	VertexToPixel output;
@@ -81,6 +84,8 @@ VertexToPixel main( VertexShaderInput input )
 	// - We don't need to alter it here, but we do need to send it to the pixel shader
 	//output.color = input.color;
 	output.normal = mul(input.normal, (float3x3)world);
+	output.tangent = mul(input.tangent, (float3x3)world);
+	output.worldPos = mul(float4(input.position, 1.0f), world).xyz;
 	output.uv = input.uv;
 	// Whatever we return will make its way through the pipeline to the
 	// next programmable stage we're using (the pixel shader for now)

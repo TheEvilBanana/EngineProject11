@@ -59,7 +59,6 @@ Game::~Game()
 	delete vertexShader;
 	delete pixelShader;
 	delete material1;
-	//delete material2;
 	delete skyVS;
 	delete skyPS;
 
@@ -67,11 +66,9 @@ Game::~Game()
 	for (auto& m : meshes) delete m;
 	delete camera;
 
-	flamesSRV->Release();
-	carpetSRV->Release();
+	metalSRV->Release();
+	normalSRV->Release();
 	sampler1->Release();
-    //sampler2->Release();
-	//sampler1->Release();
 
 	skySRV->Release();
 	rsSky->Release();
@@ -100,6 +97,7 @@ void Game::Init()
 	// geometry to draw and some simple camera matrices.
 	//  - You'll be expanding and/or replacing these later
 	LoadShaders();
+	CreateMaterials();
 	CreateMatrices();
 	CreateBasicGeometry();
 	dirLight1.SetLightValues(XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, -1.0f, 0));
@@ -138,24 +136,6 @@ void Game::Init()
 
 	
 	/************************************************************/
-	//CreateWICTextureFromFile(device, context, L"Debug/Flames.jpg", 0, &flamesSRV);
-	CreateDDSTextureFromFile(device, L"Debug/TextureFiles/SunnyCubeMap.dds", 0, &skySRV);
-
-	//Setting the sky stuff
-
-	//Set up the rasterize state
-	D3D11_RASTERIZER_DESC rsDesc = {};
-	rsDesc.FillMode = D3D11_FILL_SOLID;
-	rsDesc.CullMode = D3D11_CULL_FRONT;
-	rsDesc.DepthClipEnable = true;
-	device->CreateRasterizerState(&rsDesc, &rsSky);
-
-	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
-	dsDesc.DepthEnable = true;
-	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-	dsDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
-	device->CreateDepthStencilState(&dsDesc, &dsSky);
-
 	
 	// Tell the input assembler stage of the pipeline what kind of
 	// geometric primitives (points, lines or triangles) we want to draw.  
@@ -178,6 +158,7 @@ void Game::LoadShaders()
 	pixelShader = new SimplePixelShader(device, context);
 	if(!pixelShader->LoadShaderFile(L"Debug/PixelShader.cso"))	
 		pixelShader->LoadShaderFile(L"PixelShader.cso");
+
 	skyVS = new SimpleVertexShader(device, context);
 	if (!skyVS->LoadShaderFile(L"Debug/SkyVS.cso"))
 		skyVS->LoadShaderFile(L"SkyVS.cso");
@@ -185,9 +166,13 @@ void Game::LoadShaders()
 	skyPS = new SimplePixelShader(device, context);
 	if (!skyPS->LoadShaderFile(L"Debug/SkyPS.cso"))
 		skyPS->LoadShaderFile(L"SkyPS.cso");
+}
 
-	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/Cobble.tif", 0, &flamesSRV);
-	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/Carpet.jpg", 0, &carpetSRV);
+void Game::CreateMaterials()
+{
+	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/Testing_basecolor.png", 0, &metalSRV);
+	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/Testing_normal.png", 0, &normalSRV);
+	CreateDDSTextureFromFile(device, L"Debug/TextureFiles/SunnyCubeMap.dds", 0, &skySRV);
 
 	D3D11_SAMPLER_DESC sampleDesc = {};
 	sampleDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -196,20 +181,27 @@ void Game::LoadShaders()
 	sampleDesc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 	sampleDesc.MaxLOD = D3D11_FLOAT32_MAX;
 
-	D3D11_SAMPLER_DESC sampleDesc2 = {};
-	sampleDesc2.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampleDesc2.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampleDesc2.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
-	sampleDesc2.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
-	sampleDesc2.MaxLOD = D3D11_FLOAT32_MAX;
-
 
 	device->CreateSamplerState(&sampleDesc, &sampler1);
 	//device->CreateSamplerState(&sampleDesc2, &sampler1);
 
-	material1 = new Material(pixelShader, vertexShader, flamesSRV, sampler1);
+	material1 = new Material(pixelShader, vertexShader, metalSRV, normalSRV, sampler1);
 	//material2 = new Material(pixelShader, vertexShader, carpetSRV, sampler1);
-	
+
+	//Setting the sky stuff
+
+	//Set up the rasterize state
+	D3D11_RASTERIZER_DESC rsDesc = {};
+	rsDesc.FillMode = D3D11_FILL_SOLID;
+	rsDesc.CullMode = D3D11_CULL_FRONT;
+	rsDesc.DepthClipEnable = true;
+	device->CreateRasterizerState(&rsDesc, &rsSky);
+
+	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+	dsDesc.DepthEnable = true;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
+	device->CreateDepthStencilState(&dsDesc, &dsSky);
 }
 
 
@@ -245,7 +237,7 @@ void Game::CreateBasicGeometry()
 	cubeMesh = new Mesh("Debug/Models/cube.obj", device);
 	meshes.push_back(cubeMesh);
 
-	cubeEntity = new GameEntity(cubeMesh, material2);
+	cubeEntity = new GameEntity(cubeMesh, material1);
 	entities.push_back(cubeEntity);
 
 	entities[1]->SetScale(8.0f, 0.1f, 8.0f);
@@ -283,16 +275,16 @@ void Game::Update(float deltaTime, float totalTime)
 	
 	entities[0]->SetPosition(sphereSpace.getOrigin().x(), sphereSpace.getOrigin().y(), sphereSpace.getOrigin().z());
 	
-	tbb::parallel_invoke(
+	/*tbb::parallel_invoke(
 		[&]() { camera->Update(deltaTime); },
 		[&]() { entities[0]->UpdateWorldMatrix(); },
 		[]() {printf("Hello World"); }
-	);
+	);*/
 	
 	// Update the camera
-	/*camera->Update(deltaTime);
+	camera->Update(deltaTime);
 
-	entities[0]->UpdateWorldMatrix();*/
+	entities[0]->UpdateWorldMatrix();
 	entities[1]->UpdateWorldMatrix();
 
 	// Quit if the escape key is pressed
@@ -325,56 +317,17 @@ void Game::Draw(float deltaTime, float totalTime)
 	// Set buffers in the input assembler
 	//  - Do this ONCE PER OBJECT you're drawing, since each object might
 	//    have different geometry.
-	vertexBuffer = entities[0]->GetMesh()->GetVertexBuffer();
-	indexBuffer = entities[0]->GetMesh()->GetIndexBuffer();
-	
-	context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-	context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 
-	vertexShader->SetMatrix4x4("world", *entities[0]->GetWorldMatrix());
-	vertexShader->SetMatrix4x4("view", camera->GetView());
-	vertexShader->SetMatrix4x4("projection", camera->GetProjection());
-
-	vertexShader->CopyAllBufferData();
-	vertexShader->SetShader();
-	
-	pixelShader->SetData("light1", &dirLight1, sizeof(DirectionalLight));
-	pixelShader->SetData("light2", &dirLight2, sizeof(DirectionalLight));
-
-	pixelShader->SetShaderResourceView("textureSRV", flamesSRV);
-	pixelShader->SetSamplerState("basicSampler", sampler1);
-
-	pixelShader->CopyAllBufferData();
-	pixelShader->SetShader();
-
-	// Finally do the actual drawing
-	context->DrawIndexed(entities[0]->GetMesh()->GetIndexCount(), 0, 0);
-
-
-	//Draw the plane
-	vertexBuffer = entities[1]->GetMesh()->GetVertexBuffer();
-	indexBuffer = entities[1]->GetMesh()->GetIndexBuffer();
-
-	context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-	context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
-	vertexShader->SetMatrix4x4("world", *entities[1]->GetWorldMatrix());
-	vertexShader->SetMatrix4x4("view", camera->GetView());
-	vertexShader->SetMatrix4x4("projection", camera->GetProjection());
-
-	vertexShader->CopyAllBufferData();
-	vertexShader->SetShader();
-
-	pixelShader->SetData("light1", &dirLight1, sizeof(DirectionalLight));
-	pixelShader->SetData("light2", &dirLight2, sizeof(DirectionalLight));
-
-	pixelShader->SetShaderResourceView("textureSRV", carpetSRV);
-	pixelShader->SetSamplerState("basicSampler", sampler1);
-
-	pixelShader->CopyAllBufferData();
-	pixelShader->SetShader();
-
-	context->DrawIndexed(entities[1]->GetMesh()->GetIndexCount(), 0, 0);
+	for(int i = 0; i<= 1; i++) {
+		renderer.SetVertexBuffer(entities[i], vertexBuffer);
+		renderer.SetIndexBuffer(entities[i], indexBuffer);
+		renderer.SetVertexShader(vertexShader, entities[i], camera);
+		renderer.SetPixelShader(pixelShader, entities[i], camera);
+		context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+		context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+		// Finally do the actual drawing
+		context->DrawIndexed(entities[i]->GetMesh()->GetIndexCount(), 0, 0);
+	}
 
 	//Draw the sky
 	vertexBuffer = entities[2]->GetMesh()->GetVertexBuffer();
@@ -397,6 +350,10 @@ void Game::Draw(float deltaTime, float totalTime)
 	context->RSSetState(rsSky);
 	context->OMSetDepthStencilState(dsSky, 0);
 	context->DrawIndexed(entities[2]->GetMesh()->GetIndexCount(), 0, 0);
+
+	// Reset the render states we've changed
+	context->RSSetState(0);
+	context->OMSetDepthStencilState(0, 0);
 
 	swapChain->Present(0, 0);
 	

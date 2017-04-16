@@ -23,5 +23,6 @@ private:
 
 	void CreateBuffers(Vertex *vertices, int numVertex, unsigned int *indices, int numIndex, ID3D11Device *device);
 	void CreateBuffers(NotObjShapes vertices[], int numVertex, int indices[], int numIndex, ID3D11Device *device);
+	void CalculateTangents(Vertex* verts, int numVerts, unsigned int* indices, int numIndices);
 };
 

@@ -10,6 +10,7 @@
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
 #include <vector>
+#include "Renderer.h"
 
 
 class Game 
@@ -37,6 +38,7 @@ private:
 
 	// Initialization helper methods - feel free to customize, combine, etc.
 	void LoadShaders(); 
+	void CreateMaterials();
 	void CreateMatrices();
 	void CreateBasicGeometry();
 
@@ -53,10 +55,10 @@ private:
 	SimpleVertexShader* vertexShader;
 	SimplePixelShader* pixelShader;
 
-	ID3D11ShaderResourceView* flamesSRV;
-	ID3D11ShaderResourceView* carpetSRV;
+	ID3D11ShaderResourceView* metalSRV;
+	ID3D11ShaderResourceView* normalSRV;
+
 	ID3D11SamplerState* sampler1;
-	ID3D11SamplerState* sampler2;
 
 	// The matrices to go from model space to screen space
 	DirectX::XMFLOAT4X4 worldMatrix;
@@ -69,7 +71,8 @@ private:
 	POINT currentMousePos;
 	POINT difference;
 
-	
+	Renderer renderer;
+
 	Mesh *entityMesh1;
 	Mesh *entityMesh2;
 	Mesh* sphereMesh;
@@ -77,7 +80,6 @@ private:
 	Mesh* planeMesh;
 
 	Material *material1;
-	Material *material2;
 	
 	GameEntity *entity1;
 	GameEntity *entity2;
