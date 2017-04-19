@@ -2,11 +2,10 @@
 #include "Vertex.h"
 #include "WICTextureLoader.h"
 #include "DDSTextureLoader.h"
-
-
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
 #include <parallel_invoke.h>
+
 
 
 // For the DirectX Math library
@@ -73,6 +72,9 @@ Game::~Game()
 	skySRV->Release();
 	rsSky->Release();
 	dsSky->Release();
+	playButtonTexture->Release();
+	quitButtonTexture->Release();
+	titleTexture->Release();
 
 	delete world;
 	delete collisionConfig;
@@ -100,6 +102,23 @@ void Game::Init()
 	CreateMaterials();
 	CreateMatrices();
 	CreateBasicGeometry();
+
+	//UI
+
+	//Create SpriteBatch
+	spriteBatch.reset(new SpriteBatch(context));
+
+	//Import texture for loading
+	//CreateDDSTextureFromFile(device, L"Debug/TextureFiles/playpanel.dds", 0, &UITexture);
+	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/cyanplaypanel.png",0, &playButtonTexture);
+	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/cyanquitpanel.png", 0, &quitButtonTexture);
+
+	//Import texture for game title
+	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/asteroids.png", 0, &titleTexture);
+
+	////Import texture for the background
+	//CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/background.png", 0, &backgroundTexture);
+
 	dirLight1.SetLightValues(XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, -1.0f, 0));
 	dirLight2.SetLightValues(XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(-1.0f, -1.0f, 0));
 	
@@ -267,13 +286,33 @@ void Game::OnResize()
 // --------------------------------------------------------
 void Game::Update(float deltaTime, float totalTime)
 {
-	float sinTime = (sin(totalTime * 2) + 2.0f) / 10.0f;
+	//Game State Management
+	if (mouseAtPlay)
+	{
+		gameState = GamePlay;
+		float sinTime = (sin(totalTime * 2) + 2.0f) / 10.0f;
+
+		world->stepSimulation(deltaTime);
+		btTransform sphereSpace;
+		sphereBody->getMotionState()->getWorldTransform(sphereSpace);
+
+		entities[0]->SetPosition(sphereSpace.getOrigin().x(), sphereSpace.getOrigin().y(), sphereSpace.getOrigin().z());
+		// Update the camera
+		camera->Update(deltaTime);
+
+		entities[0]->UpdateWorldMatrix();
+		entities[1]->UpdateWorldMatrix();
+	}
+	else
+	{
+		gameState = MainMenu;
+	}
+
+	if (mouseAtQuit)
+	{
+		gameState = Exit;
+	}
 	
-	world->stepSimulation(deltaTime);
-	btTransform sphereSpace;
-	sphereBody->getMotionState()->getWorldTransform(sphereSpace);
-	
-	entities[0]->SetPosition(sphereSpace.getOrigin().x(), sphereSpace.getOrigin().y(), sphereSpace.getOrigin().z());
 	
 	/*tbb::parallel_invoke(
 		[&]() { camera->Update(deltaTime); },
@@ -281,15 +320,12 @@ void Game::Update(float deltaTime, float totalTime)
 		[]() {printf("Hello World"); }
 	);*/
 	
-	// Update the camera
-	camera->Update(deltaTime);
-
-	entities[0]->UpdateWorldMatrix();
-	entities[1]->UpdateWorldMatrix();
+	
 
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
+	
 	
 
 }
@@ -318,42 +354,90 @@ void Game::Draw(float deltaTime, float totalTime)
 	//  - Do this ONCE PER OBJECT you're drawing, since each object might
 	//    have different geometry.
 
-	for(int i = 0; i<= 1; i++) {
-		renderer.SetVertexBuffer(entities[i], vertexBuffer);
-		renderer.SetIndexBuffer(entities[i], indexBuffer);
-		renderer.SetVertexShader(vertexShader, entities[i], camera);
-		renderer.SetPixelShader(pixelShader, entities[i], camera);
+	switch (gameState)
+	{
+	case MainMenu:
+		////Draw the sky
+		//vertexBuffer = entities[2]->GetMesh()->GetVertexBuffer();
+		//indexBuffer = entities[2]->GetMesh()->GetIndexBuffer();
+
+		////Set the buffers in the input assembler
+		//context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+		//context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+
+		////Set up the sky shaders
+		//skyVS->SetMatrix4x4("view", camera->GetView());
+		//skyVS->SetMatrix4x4("projection", camera->GetProjection());
+		//skyVS->CopyAllBufferData();
+		//skyVS->SetShader();
+
+		//skyPS->SetShaderResourceView("Sky", skySRV);
+		//skyPS->CopyAllBufferData();
+		//skyPS->SetShader();
+
+		//context->RSSetState(rsSky);
+		//context->OMSetDepthStencilState(dsSky, 0);
+		//context->DrawIndexed(entities[2]->GetMesh()->GetIndexCount(), 0, 0);
+
+		//// Reset the render states we've changed
+		//context->RSSetState(0);
+		//context->OMSetDepthStencilState(0, 0);
+
+		spriteBatch->Begin();
+
+		//Draw title, play and quit sprites
+		spriteBatch->Draw(titleTexture, XMFLOAT2(300, 100));
+		spriteBatch->Draw(playButtonTexture, playSpritePosition);
+		spriteBatch->Draw(quitButtonTexture, quitSpritePosition);
+		
+		spriteBatch->End();
+		break;
+	
+	case GamePlay:
+		//Draw the sky
+		vertexBuffer = entities[2]->GetMesh()->GetVertexBuffer();
+		indexBuffer = entities[2]->GetMesh()->GetIndexBuffer();
+
+		//Set the buffers in the input assembler
 		context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
 		context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-		// Finally do the actual drawing
-		context->DrawIndexed(entities[i]->GetMesh()->GetIndexCount(), 0, 0);
-	}
 
-	//Draw the sky
-	vertexBuffer = entities[2]->GetMesh()->GetVertexBuffer();
-	indexBuffer = entities[2]->GetMesh()->GetIndexBuffer();
+		//Set up the sky shaders
+		skyVS->SetMatrix4x4("view", camera->GetView());
+		skyVS->SetMatrix4x4("projection", camera->GetProjection());
+		skyVS->CopyAllBufferData();
+		skyVS->SetShader();
 
-	//Set the buffers in the input assembler
-	context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-	context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+		skyPS->SetShaderResourceView("Sky", skySRV);
+		skyPS->CopyAllBufferData();
+		skyPS->SetShader();
 
-	//Set up the sky shaders
-	skyVS->SetMatrix4x4("view", camera->GetView());
-	skyVS->SetMatrix4x4("projection", camera->GetProjection());
-	skyVS->CopyAllBufferData();
-	skyVS->SetShader();
+		context->RSSetState(rsSky);
+		context->OMSetDepthStencilState(dsSky, 0);
+		context->DrawIndexed(entities[2]->GetMesh()->GetIndexCount(), 0, 0);
 
-	skyPS->SetShaderResourceView("Sky", skySRV);
-	skyPS->CopyAllBufferData();
-	skyPS->SetShader();
-
-	context->RSSetState(rsSky);
-	context->OMSetDepthStencilState(dsSky, 0);
-	context->DrawIndexed(entities[2]->GetMesh()->GetIndexCount(), 0, 0);
-
-	// Reset the render states we've changed
-	context->RSSetState(0);
-	context->OMSetDepthStencilState(0, 0);
+		// Reset the render states we've changed
+		context->RSSetState(0);
+		context->OMSetDepthStencilState(0, 0);
+		//*********************************************************//
+		
+		for (int i = 0; i <= 1; i++) {
+			renderer.SetVertexBuffer(entities[i], vertexBuffer);
+			renderer.SetIndexBuffer(entities[i], indexBuffer);
+			renderer.SetVertexShader(vertexShader, entities[i], camera);
+			renderer.SetPixelShader(pixelShader, entities[i], camera);
+			context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+			context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+			// Finally do the actual drawing
+			context->DrawIndexed(entities[i]->GetMesh()->GetIndexCount(), 0, 0);
+		}
+		break;
+	case Exit:
+		Quit();
+		break;
+	default:
+		break;
+	}	
 
 	swapChain->Present(0, 0);
 	
@@ -382,6 +466,20 @@ void Game::OnMouseDown(WPARAM buttonState, int x, int y)
 	prevMousePos.x = x;
 	prevMousePos.y = y;
 
+	if (((x > playSpritePosition.x - 50) && (x < playSpritePosition.x + 50)) && ((y > playSpritePosition.y - 50) && (y < playSpritePosition.y + 50)))
+	{
+		if (buttonState & 0x0001)
+		{
+			mouseAtPlay = true;
+		}
+	}
+	if (((x > quitSpritePosition.x - 50) && (x < quitSpritePosition.x + 50)) && ((y > quitSpritePosition.y - 50) && (y < quitSpritePosition.y + 50)))
+	{
+		if (buttonState & 0x0001)
+		{
+			mouseAtQuit = true;
+		}
+	}
 	// Caputure the mouse so we keep getting mouse move
 	// events even if the mouse leaves the window.  we'll be
 	// releasing the capture once a mouse button is released

@@ -11,6 +11,8 @@
 #include "btBulletDynamicsCommon.h"
 #include <vector>
 #include "Renderer.h"
+#include "SpriteBatch.h"
+#include "SpriteFont.h"
 
 
 class Game 
@@ -114,5 +116,25 @@ private:
 	btMotionState* sphereMotion;
 
 
+
+	//UI Stuff
+	std::unique_ptr<SpriteBatch> spriteBatch;
+	ID3D11ShaderResourceView* playButtonTexture;
+	XMFLOAT2 playSpritePosition = XMFLOAT2(500,300);
+	bool mouseAtPlay = false;
+	ID3D11ShaderResourceView* titleTexture;
+	ID3D11ShaderResourceView* quitButtonTexture;
+	XMFLOAT2 quitSpritePosition = XMFLOAT2(525, 500);
+	//ID3D11ShaderResourceView* backgroundTexture;
+	bool mouseAtQuit = false;
+
+	//Game State Management
+	enum GameStateManager
+	{
+		MainMenu,
+		GamePlay,
+		Exit
+	};
+	GameStateManager gameState;
 };
 
