@@ -4,6 +4,11 @@
 #include <sstream>
 
 #include <parallel_invoke.h>
+//This shows the following error
+//Cannot open the include file
+//This file is in the internal folder in the tbb source code
+//The code for creating threads is in the Run function
+//#include <tbb.h>
 
 
 // Define the static instance variable so our OS-level 
@@ -366,15 +371,15 @@ void DXCore::OnResize()
 //	printf("world");
 //}
 
-//void testtbb1()
-//{
-//	printf("hello");
-//}
-//
-//void testtbb2()
-//{
-//	printf("world");
-//}
+void testtbb1()
+{
+	printf("hello");
+}
+
+void testtbb2()
+{
+	printf("world");
+}
 
 // --------------------------------------------------------
 // This is the main game loop, handling the following:
@@ -417,15 +422,23 @@ HRESULT DXCore::Run()
 			Update(deltaTime, totalTime);
 			Draw(deltaTime, totalTime);
 
-			
 
+			//This shows the following error
+			//Cannot open the include file
+			//This file is in the internal folder in the tbb source code
+			/*tbb::tbb_thread mythread(testtbb1);
+			mythread.join();*/
+
+
+
+			//Calling function with normal function works fine
 			/*tbb::parallel_invoke(
 
 				[&]() { testtbb1(); },
 
 				[&]() { testtbb2(); }
 
-			);*/
+			)*/;
 		}
 	}
 
