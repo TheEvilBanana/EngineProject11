@@ -64,7 +64,7 @@ Game::~Game()
 	for (auto& e : entities) delete e;
 	for (auto& m : meshes) delete m;
 	delete camera;
-
+	delete camera2;
 	metalSRV->Release();
 	normalSRV->Release();
 	sampler1->Release();
@@ -231,9 +231,13 @@ void Game::CreateMaterials()
 // --------------------------------------------------------
 void Game::CreateMatrices()
 {
-	camera = new Camera(0, 6, -15);
+	camera = new Camera(0, 6, -15, true);
 	camera->UpdateProjectionMatrix((float) width / height);
 
+	camera2 = new Camera(0, 5, -15, false);
+	camera2->UpdateProjectionMatrix((float) width / height);
+
+	camera2->Rotate(0, 0);
 }
 
 
@@ -278,6 +282,9 @@ void Game::OnResize()
 	// camera exists
 	if (camera)
 		camera->UpdateProjectionMatrix((float) width / height);
+
+	if (camera2)
+		camera2->UpdateProjectionMatrix((float) width / height);
 }
 
 
@@ -299,6 +306,7 @@ void Game::Update(float deltaTime, float totalTime)
 		entities[0]->SetPosition(sphereSpace.getOrigin().x(), sphereSpace.getOrigin().y(), sphereSpace.getOrigin().z());
 		// Update the camera
 		camera->Update(deltaTime);
+		camera2->Update(deltaTime);
 
 		entities[0]->UpdateWorldMatrix();
 		entities[1]->UpdateWorldMatrix();
@@ -349,7 +357,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		0);
 	UINT stride = sizeof(Vertex);
 	UINT offset = 0;
-
+	context->RSSetViewports(1, &viewport);
 	// Set buffers in the input assembler
 	//  - Do this ONCE PER OBJECT you're drawing, since each object might
 	//    have different geometry.
@@ -394,6 +402,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		break;
 	
 	case GamePlay:
+	{
 		//Draw the sky
 		vertexBuffer = entities[2]->GetMesh()->GetVertexBuffer();
 		indexBuffer = entities[2]->GetMesh()->GetIndexBuffer();
@@ -430,6 +439,30 @@ void Game::Draw(float deltaTime, float totalTime)
 			context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 			// Finally do the actual drawing
 			context->DrawIndexed(entities[i]->GetMesh()->GetIndexCount(), 0, 0);
+		}
+		const float color2[4] = {0.25f, 0.25f, 0.25f, 1.0f};
+		// Clear the render target and depth buffer (erases what's on the screen)
+		//  - Do this ONCE PER FRAME
+		//  - At the beginning of Draw (before drawing *anything*)
+		//context->ClearRenderTargetView(backBufferRTV, color2);
+		context->ClearDepthStencilView(
+			depthStencilView,
+			D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL,
+			1.0f,
+			0);
+		UINT stride = sizeof(Vertex);
+		UINT offset = 0;
+		context->RSSetViewports(1, &viewportMiniMap);
+		for (int i = 0; i <= 1; i++) {
+			renderer.SetVertexBuffer(entities[i], vertexBuffer);
+			renderer.SetIndexBuffer(entities[i], indexBuffer);
+			renderer.SetVertexShader(vertexShader, entities[i], camera2);
+			renderer.SetPixelShader(pixelShader, entities[i], camera2);
+			context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+			context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+			// Finally do the actual drawing
+			context->DrawIndexed(entities[i]->GetMesh()->GetIndexCount(), 0, 0);
+		}
 		}
 		break;
 	case Exit:

@@ -4,7 +4,7 @@
 
 class Camera {
 public:
-	Camera(float x, float y, float z);
+	Camera(float x, float y, float z, bool cameraMove);
 	~Camera();
 
 	// Transformations
@@ -33,4 +33,6 @@ private:
 	DirectX::XMFLOAT4 rotation;
 	float xRotation;
 	float yRotation;
+
+	bool cameraMove;
 };

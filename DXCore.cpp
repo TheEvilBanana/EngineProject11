@@ -258,7 +258,7 @@ HRESULT DXCore::InitDirectX()
 
 	// Lastly, set up a viewport so we render into
 	// to correct portion of the window
-	D3D11_VIEWPORT viewport = {};
+	viewport = {};
 	viewport.TopLeftX	= 0;
 	viewport.TopLeftY	= 0;
 	viewport.Width		= (float)width;
@@ -267,6 +267,14 @@ HRESULT DXCore::InitDirectX()
 	viewport.MaxDepth	= 1.0f;
 	context->RSSetViewports(1, &viewport);
 
+	viewportMiniMap = {};
+	viewportMiniMap.TopLeftX = (float)width - 240;;
+	viewportMiniMap.TopLeftY = (float)height - 120;
+	viewportMiniMap.Width = (float) 240;
+	viewportMiniMap.Height = (float) 120;
+	viewportMiniMap.MinDepth = 0.0f;
+	viewportMiniMap.MaxDepth = 1.0f;
+	context->RSSetViewports(1, &viewportMiniMap);
 	// Return the "everything is ok" HRESULT value
 	return S_OK;
 }
@@ -327,7 +335,7 @@ void DXCore::OnResize()
 
 	// Lastly, set up a viewport so we render into
 	// to correct portion of the window
-	D3D11_VIEWPORT viewport = {};
+	viewport = {};
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
 	viewport.Width = (float)width;
@@ -335,6 +343,17 @@ void DXCore::OnResize()
 	viewport.MinDepth = 0.0f;
 	viewport.MaxDepth = 1.0f;
 	context->RSSetViewports(1, &viewport);
+
+	viewportMiniMap = {};
+	viewportMiniMap.TopLeftX = (float) width - 240;;
+	viewportMiniMap.TopLeftY = (float) height - 120;
+	viewportMiniMap.Width = (float) 240;
+	viewportMiniMap.Height = (float) 120;
+	viewportMiniMap.MinDepth = 0.0f;
+	viewportMiniMap.MaxDepth = 1.0f;
+	context->RSSetViewports(1, &viewportMiniMap);
+
+
 }
 
 //void DXCore::testtbb1()

@@ -1,10 +1,17 @@
-﻿  Game.cpp
+﻿  Renderer.cpp
+  Main.cpp
 d:\class stuff\game engine\engineproject11\packages\bullet\src\linearmath\btidebugdraw.h(169): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
 d:\class stuff\game engine\engineproject11\packages\bullet\src\linearmath\btidebugdraw.h(170): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
 d:\class stuff\game engine\engineproject11\packages\bullet\src\linearmath\btidebugdraw.h(171): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
-d:\class stuff\game engine\engineproject11\game.cpp(15): warning C4005: 'max': macro redefinition
+  Game.cpp
+d:\class stuff\game engine\engineproject11\packages\bullet\src\linearmath\btidebugdraw.h(169): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
+d:\class stuff\game engine\engineproject11\packages\bullet\src\linearmath\btidebugdraw.h(170): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
+d:\class stuff\game engine\engineproject11\packages\bullet\src\linearmath\btidebugdraw.h(171): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
+d:\class stuff\game engine\engineproject11\game.cpp(14): warning C4005: 'max': macro redefinition
   c:\program files (x86)\windows kits\8.1\include\shared\minwindef.h(193): note: see previous definition of 'max'
-d:\class stuff\game engine\engineproject11\game.cpp(16): warning C4005: 'min': macro redefinition
+d:\class stuff\game engine\engineproject11\game.cpp(15): warning C4005: 'min': macro redefinition
   c:\program files (x86)\windows kits\8.1\include\shared\minwindef.h(197): note: see previous definition of 'min'
+  Camera.cpp
+  Generating Code...
   EngineProject.vcxproj -> D:\Class Stuff\Game Engine\EngineProject11\Debug\EngineProject.exe
   EngineProject.vcxproj -> D:\Class Stuff\Game Engine\EngineProject11\Debug\EngineProject.pdb (Full PDB)

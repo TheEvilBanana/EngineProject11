@@ -48,7 +48,7 @@ private:
 	std::vector<Mesh*> meshes;
 	std::vector<GameEntity*> entities;
 	Camera* camera;
-
+	Camera* camera2;
 	// Buffers to hold actual geometry data
 	ID3D11Buffer* vertexBuffer;
 	ID3D11Buffer* indexBuffer;
