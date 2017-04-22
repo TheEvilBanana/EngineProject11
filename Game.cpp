@@ -4,7 +4,7 @@
 #include "DDSTextureLoader.h"
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
-#include <parallel_invoke.h>
+// <parallel_invoke.h>
 
 
 

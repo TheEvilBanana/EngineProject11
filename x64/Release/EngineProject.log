@@ -1,0 +1,67 @@
+﻿  compilation object save succeeded; see D:\Class Stuff\Game Engine\EngineProject11\x64\Release\PixelShader.cso
+  compilation object save succeeded; see D:\Class Stuff\Game Engine\EngineProject11\x64\Release\SkyPS.cso
+  compilation object save succeeded; see D:\Class Stuff\Game Engine\EngineProject11\x64\Release\SkyVS.cso
+  compilation object save succeeded; see D:\Class Stuff\Game Engine\EngineProject11\x64\Release\VertexShader.cso
+  Camera.cpp
+  DXCore.cpp
+DXCore.cpp(434): warning C4244: 'return': conversion from 'WPARAM' to 'HRESULT', possible loss of data
+  Game.cpp
+d:\class stuff\game engine\engineproject11\SimpleShader.h(102): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+d:\class stuff\game engine\engineproject11\SimpleShader.h(106): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+d:\class stuff\game engine\engineproject11\packages\bullet\src\LinearMath/btIDebugDraw.h(169): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
+d:\class stuff\game engine\engineproject11\packages\bullet\src\LinearMath/btIDebugDraw.h(170): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
+d:\class stuff\game engine\engineproject11\packages\bullet\src\LinearMath/btIDebugDraw.h(171): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
+Game.cpp(14): warning C4005: 'max': macro redefinition
+  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\minwindef.h(193): note: see previous definition of 'max'
+Game.cpp(15): warning C4005: 'min': macro redefinition
+  C:\Program Files (x86)\Windows Kits\8.1\Include\shared\minwindef.h(197): note: see previous definition of 'min'
+  GameEntity.cpp
+d:\class stuff\game engine\engineproject11\SimpleShader.h(102): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+d:\class stuff\game engine\engineproject11\SimpleShader.h(106): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+  Main.cpp
+d:\class stuff\game engine\engineproject11\SimpleShader.h(102): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+d:\class stuff\game engine\engineproject11\SimpleShader.h(106): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+d:\class stuff\game engine\engineproject11\packages\bullet\src\LinearMath/btIDebugDraw.h(169): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
+d:\class stuff\game engine\engineproject11\packages\bullet\src\LinearMath/btIDebugDraw.h(170): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
+d:\class stuff\game engine\engineproject11\packages\bullet\src\LinearMath/btIDebugDraw.h(171): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
+  Material.cpp
+d:\class stuff\game engine\engineproject11\SimpleShader.h(102): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+d:\class stuff\game engine\engineproject11\SimpleShader.h(106): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+  Mesh.cpp
+  Renderer.cpp
+d:\class stuff\game engine\engineproject11\SimpleShader.h(102): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+d:\class stuff\game engine\engineproject11\SimpleShader.h(106): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+  SimpleShader.cpp
+d:\class stuff\game engine\engineproject11\SimpleShader.h(102): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+d:\class stuff\game engine\engineproject11\SimpleShader.h(106): warning C4267: 'return': conversion from 'size_t' to 'unsigned int', possible loss of data
+SimpleShader.cpp(123): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+SimpleShader.cpp(135): warning C4267: '=': conversion from 'size_t' to 'unsigned int', possible loss of data
+SimpleShader.cpp(681): warning C4267: 'initializing': conversion from 'size_t' to 'int', possible loss of data
+SimpleShader.cpp(741): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+SimpleShader.cpp(1310): warning C4267: 'argument': conversion from 'size_t' to 'UINT', possible loss of data
+Game.obj : error LNK2001: unresolved external symbol "public: __cdecl btDefaultCollisionConfiguration::btDefaultCollisionConfiguration(struct btDefaultCollisionConstructionInfo const &)" (??0btDefaultCollisionConfiguration@@QEAA@AEBUbtDefaultCollisionConstructionInfo@@@Z)
+Game.obj : error LNK2001: unresolved external symbol "public: virtual void __cdecl btCollisionShape::serializeSingleShape(class btSerializer *)const " (?serializeSingleShape@btCollisionShape@@UEBAXPEAVbtSerializer@@@Z)
+Game.obj : error LNK2001: unresolved external symbol "public: virtual char const * __cdecl btCollisionShape::serialize(void *,class btSerializer *)const " (?serialize@btCollisionShape@@UEBAPEBDPEAXPEAVbtSerializer@@@Z)
+Game.obj : error LNK2001: unresolved external symbol "public: virtual float __cdecl btCollisionShape::getContactBreakingThreshold(float)const " (?getContactBreakingThreshold@btCollisionShape@@UEBAMM@Z)
+Game.obj : error LNK2001: unresolved external symbol "public: virtual float __cdecl btCollisionShape::getAngularMotionDisc(void)const " (?getAngularMotionDisc@btCollisionShape@@UEBAMXZ)
+Game.obj : error LNK2001: unresolved external symbol "public: virtual void __cdecl btCollisionShape::getBoundingSphere(class btVector3 &,float &)const " (?getBoundingSphere@btCollisionShape@@UEBAXAEAVbtVector3@@AEAM@Z)
+Game.obj : error LNK2001: unresolved external symbol "public: __cdecl btDbvtBroadphase::btDbvtBroadphase(class btOverlappingPairCache *)" (??0btDbvtBroadphase@@QEAA@PEAVbtOverlappingPairCache@@@Z)
+Game.obj : error LNK2001: unresolved external symbol "public: __cdecl btDiscreteDynamicsWorld::btDiscreteDynamicsWorld(class btDispatcher *,class btBroadphaseInterface *,class btConstraintSolver *,class btCollisionConfiguration *)" (??0btDiscreteDynamicsWorld@@QEAA@PEAVbtDispatcher@@PEAVbtBroadphaseInterface@@PEAVbtConstraintSolver@@PEAVbtCollisionConfiguration@@@Z)
+Game.obj : error LNK2001: unresolved external symbol "public: __cdecl btRigidBody::btRigidBody(struct btRigidBody::btRigidBodyConstructionInfo const &)" (??0btRigidBody@@QEAA@AEBUbtRigidBodyConstructionInfo@0@@Z)
+Game.obj : error LNK2001: unresolved external symbol "void __cdecl btAlignedFreeInternal(void *)" (?btAlignedFreeInternal@@YAXPEAX@Z)
+Game.obj : error LNK2001: unresolved external symbol "public: virtual void __cdecl btSphereShape::getAabb(class btTransform const &,class btVector3 &,class btVector3 &)const " (?getAabb@btSphereShape@@UEBAXAEBVbtTransform@@AEAVbtVector3@@1@Z)
+Game.obj : error LNK2001: unresolved external symbol "public: virtual void __cdecl btSphereShape::calculateLocalInertia(float,class btVector3 &)const " (?calculateLocalInertia@btSphereShape@@UEBAXMAEAVbtVector3@@@Z)
+Game.obj : error LNK2001: unresolved external symbol "public: virtual void __cdecl btSphereShape::batchedUnitVectorGetSupportingVertexWithoutMargin(class btVector3 const *,class btVector3 *,int)const " (?batchedUnitVectorGetSupportingVertexWithoutMargin@btSphereShape@@UEBAXPEBVbtVector3@@PEAV2@H@Z)
+Game.obj : error LNK2001: unresolved external symbol "public: virtual class btVector3 __cdecl btSphereShape::localGetSupportingVertexWithoutMargin(class btVector3 const &)const " (?localGetSupportingVertexWithoutMargin@btSphereShape@@UEBA?AVbtVector3@@AEBV2@@Z)
+Game.obj : error LNK2001: unresolved external symbol "public: virtual class btVector3 __cdecl btSphereShape::localGetSupportingVertex(class btVector3 const &)const " (?localGetSupportingVertex@btSphereShape@@UEBA?AVbtVector3@@AEBV2@@Z)
+Game.obj : error LNK2001: unresolved external symbol "public: __cdecl btStaticPlaneShape::btStaticPlaneShape(class btVector3 const &,float)" (??0btStaticPlaneShape@@QEAA@AEBVbtVector3@@M@Z)
+Game.obj : error LNK2001: unresolved external symbol "public: virtual void __cdecl btConvexInternalShape::setLocalScaling(class btVector3 const &)" (?setLocalScaling@btConvexInternalShape@@UEAAXAEBVbtVector3@@@Z)
+Game.obj : error LNK2001: unresolved external symbol "public: virtual void __cdecl btConvexInternalShape::getAabbSlow(class btTransform const &,class btVector3 &,class btVector3 &)const " (?getAabbSlow@btConvexInternalShape@@UEBAXAEBVbtTransform@@AEAVbtVector3@@1@Z)
+Game.obj : error LNK2001: unresolved external symbol "public: virtual class btVector3 __cdecl btConvexInternalShape::localGetSupportingVertex(class btVector3 const &)const " (?localGetSupportingVertex@btConvexInternalShape@@UEBA?AVbtVector3@@AEBV2@@Z)
+Game.obj : error LNK2001: unresolved external symbol "protected: __cdecl btConvexInternalShape::btConvexInternalShape(void)" (??0btConvexInternalShape@@IEAA@XZ)
+Game.obj : error LNK2001: unresolved external symbol "public: virtual void __cdecl btConvexShape::project(class btTransform const &,class btVector3 const &,float &,float &,class btVector3 &,class btVector3 &)const " (?project@btConvexShape@@UEBAXAEBVbtTransform@@AEBVbtVector3@@AEAM2AEAV3@3@Z)
+Game.obj : error LNK2001: unresolved external symbol "public: virtual __cdecl btConvexShape::~btConvexShape(void)" (??1btConvexShape@@UEAA@XZ)
+Game.obj : error LNK2001: unresolved external symbol "void * __cdecl btAlignedAllocInternal(unsigned __int64,int)" (?btAlignedAllocInternal@@YAPEAX_KH@Z)
+Game.obj : error LNK2001: unresolved external symbol "public: __cdecl btSequentialImpulseConstraintSolver::btSequentialImpulseConstraintSolver(void)" (??0btSequentialImpulseConstraintSolver@@QEAA@XZ)
+Game.obj : error LNK2001: unresolved external symbol "public: __cdecl btCollisionDispatcher::btCollisionDispatcher(class btCollisionConfiguration *)" (??0btCollisionDispatcher@@QEAA@PEAVbtCollisionConfiguration@@@Z)
+D:\Class Stuff\Game Engine\EngineProject11\x64\Release\EngineProject.exe : fatal error LNK1120: 25 unresolved externals

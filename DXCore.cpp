@@ -3,7 +3,7 @@
 #include <WindowsX.h>
 #include <sstream>
 
-#include <parallel_invoke.h>
+//#include <parallel_invoke.h>
 
 
 // Define the static instance variable so our OS-level 
