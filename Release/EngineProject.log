@@ -1,2 +1,3 @@
-﻿  EngineProject.vcxproj -> D:\Class Stuff\Game Engine\EngineProject11\Release\EngineProject.exe
-  EngineProject.vcxproj -> D:\Class Stuff\Game Engine\EngineProject11\Release\EngineProject.pdb (Full PDB)
+﻿D:\Class Stuff\Game Engine\EngineProject11\PixelShader.hlsl(64,61-69): error X3004: undeclared identifier 'dirLight2'
+  
+  compilation failed; no code produced
