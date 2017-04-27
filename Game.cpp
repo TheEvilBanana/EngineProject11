@@ -130,7 +130,7 @@ void Game::Init()
 	solver = new btSequentialImpulseConstraintSolver();           // Calculates everything i.e force, speed etc on collision
 
 	world = new btDiscreteDynamicsWorld(dispatcher, broadphase, solver, collisionConfig);  // Create world using the above 4 properties
-	world->setGravity(btVector3(0, -5, 0));                                                // Setting world gravity
+	world->setGravity(btVector3(0, 0, 0));                                                // Setting world gravity
 	
 	btTransform planeTransform;                                                         // Initiate transform
 	planeTransform.setIdentity();                                                       // Setup transform
@@ -246,7 +246,7 @@ void Game::CreateMatrices()
 // --------------------------------------------------------
 void Game::CreateBasicGeometry()
 {
-	sphereMesh = new Mesh("Debug/Models/sphere.obj", device);
+	sphereMesh = new Mesh("Debug/Models/asteroid.obj", device);
 	meshes.push_back(sphereMesh);
 
 	sphereEntity = new GameEntity(sphereMesh, material1);
@@ -316,7 +316,7 @@ void Game::Update(float deltaTime, float totalTime)
 		gameState = MainMenu;
 	}
 
-	if (mouseAtQuit)
+	if (mouseAtQuit && gameState==MainMenu)
 	{
 		gameState = Exit;
 	}
