@@ -191,7 +191,7 @@ void Game::CreateMaterials()
 {
 	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/Testing_basecolor.png", 0, &metalSRV);
 	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/Testing_normal.png", 0, &normalSRV);
-	CreateDDSTextureFromFile(device, L"Debug/TextureFiles/SunnyCubeMap.dds", 0, &skySRV);
+	CreateDDSTextureFromFile(device, L"Debug/TextureFiles/Star.dds", 0, &skySRV);
 
 	D3D11_SAMPLER_DESC sampleDesc = {};
 	sampleDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -344,7 +344,7 @@ void Game::Update(float deltaTime, float totalTime)
 void Game::Draw(float deltaTime, float totalTime)
 {
 	// Background color (Cornflower Blue in this case) for clearing
-	const float color[4] = {0.4f, 0.6f, 0.75f, 0.0f};
+	const float color[4] = {0.0f, 0.0f, 0.0f, 0.0f};
 
 	// Clear the render target and depth buffer (erases what's on the screen)
 	//  - Do this ONCE PER FRAME
@@ -499,14 +499,14 @@ void Game::OnMouseDown(WPARAM buttonState, int x, int y)
 	prevMousePos.x = x;
 	prevMousePos.y = y;
 
-	if (((x > playSpritePosition.x - 50) && (x < playSpritePosition.x + 50)) && ((y > playSpritePosition.y - 50) && (y < playSpritePosition.y + 50)))
+	if (((x > playSpritePosition.x) && (x < playSpritePosition.x + 250)) && ((y > playSpritePosition.y) && (y < playSpritePosition.y + 250)))
 	{
 		if (buttonState & 0x0001)
 		{
 			mouseAtPlay = true;
 		}
 	}
-	if (((x > quitSpritePosition.x - 50) && (x < quitSpritePosition.x + 50)) && ((y > quitSpritePosition.y - 50) && (y < quitSpritePosition.y + 50)))
+	if (((x > quitSpritePosition.x) && (x < quitSpritePosition.x + 250)) && ((y > quitSpritePosition.y) && (y < quitSpritePosition.y + 250)))
 	{
 		if (buttonState & 0x0001)
 		{
