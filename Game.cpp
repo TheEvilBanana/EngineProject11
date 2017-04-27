@@ -189,8 +189,8 @@ void Game::LoadShaders()
 
 void Game::CreateMaterials()
 {
-	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/Testing_basecolor.png", 0, &metalSRV);
-	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/Testing_normal.png", 0, &normalSRV);
+	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/asteroid.tif", 0, &metalSRV);
+	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/asteroidNormalMap.tif", 0, &normalSRV);
 	CreateDDSTextureFromFile(device, L"Debug/TextureFiles/Star.dds", 0, &skySRV);
 
 	D3D11_SAMPLER_DESC sampleDesc = {};
