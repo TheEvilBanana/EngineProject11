@@ -310,6 +310,10 @@ void Game::Update(float deltaTime, float totalTime)
 
 		entities[0]->UpdateWorldMatrix();
 		entities[1]->UpdateWorldMatrix();
+
+		//Asteroid Movement
+		sphereEntity->Move(5.0f, 0.0f, 0);
+		sphereEntity->Rotate(0.001f, 0.001f, 0);
 	}
 	else
 	{
