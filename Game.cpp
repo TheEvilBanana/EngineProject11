@@ -60,6 +60,9 @@ Game::~Game()
 	delete material1;
 	delete skyVS;
 	delete skyPS;
+	delete particleVS;
+	delete particlePS;
+
 
 	for (auto& e : entities) delete e;
 	for (auto& m : meshes) delete m;
@@ -87,6 +90,12 @@ Game::~Game()
 	delete planeMotion;
 	delete sphere;
 	delete sphereMotion;
+
+	//Particle Stuff
+	particleTexture->Release();
+	particleBlendState->Release();
+	particleDepthState->Release();
+	delete emitter;
 }
 
 // --------------------------------------------------------
@@ -118,6 +127,50 @@ void Game::Init()
 
 	////Import texture for the background
 	//CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/background.png", 0, &backgroundTexture);
+
+	//Import particle texture
+	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/Shock.jpg", 0, &particleTexture);
+
+	// A depth state for the particles
+	D3D11_DEPTH_STENCIL_DESC dsDesc = {};
+	dsDesc.DepthEnable = true;
+	dsDesc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO; // Turns off depth writing
+	dsDesc.DepthFunc = D3D11_COMPARISON_LESS;
+	device->CreateDepthStencilState(&dsDesc, &particleDepthState);
+
+
+	// Blend for particles (additive)
+	D3D11_BLEND_DESC blend = {};
+	blend.AlphaToCoverageEnable = false;
+	blend.IndependentBlendEnable = false;
+	blend.RenderTarget[0].BlendEnable = true;
+	blend.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+	blend.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+	blend.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
+	blend.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+	blend.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+	blend.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
+	blend.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+	device->CreateBlendState(&blend, &particleBlendState);
+
+	// Set up particles
+	emitter = new Emitter(
+		5000,							// Max particles
+		100,							// Particles per second
+		3,								// Particle lifetime
+		1.0f,							// Start size
+		1.0f,							// End size
+		XMFLOAT4(1, 1.0f, 1.0f, 0.2f),	// Start color
+		XMFLOAT4(1, 1.0f, 1.0f, 0.2f),		// End color
+		XMFLOAT3(0, 5, 10),				// Start velocity
+		XMFLOAT3(0, 5, 10),				// Start position
+		XMFLOAT3(0, 0, 10),				// Start acceleration
+		device,
+		particleVS,
+		particlePS,
+		particleTexture
+	);
+
 
 	dirLight1.SetLightValues(XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, -1.0f, 0));
 	dirLight2.SetLightValues(XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(-1.0f, -1.0f, 0));
@@ -185,6 +238,14 @@ void Game::LoadShaders()
 	skyPS = new SimplePixelShader(device, context);
 	if (!skyPS->LoadShaderFile(L"Debug/SkyPS.cso"))
 		skyPS->LoadShaderFile(L"SkyPS.cso");
+
+	particleVS = new SimpleVertexShader(device, context);
+	if (!particleVS->LoadShaderFile(L"Debug/ParticleVS.cso"))
+		particleVS->LoadShaderFile(L"ParticleVS.cso");
+
+	particlePS = new SimplePixelShader(device, context);
+	if (!particlePS->LoadShaderFile(L"Debug/ParticlePS.cso"))
+		particlePS->LoadShaderFile(L"ParticlePS.cso");
 }
 
 void Game::CreateMaterials()
@@ -314,6 +375,24 @@ void Game::Update(float deltaTime, float totalTime)
 		//Asteroid Movement
 		sphereEntity->Move(5.0f, 0.0f, 0);
 		sphereEntity->Rotate(0.001f, 0.001f, 0);
+
+		//Trail particle
+		static bool isTabPressedLastFrame = false;
+		static float shootTimer = 0.0f;
+		bool isTabPressed = GetAsyncKeyState(VK_TAB);
+		if (!isTabPressedLastFrame && isTabPressed && shootTimer <= 0.0f)
+		{
+			shootTimer = 0.1f;
+		}
+		isTabPressedLastFrame = isTabPressed;
+
+		if (shootTimer > 0.0f)
+		{
+			emitter->SpawnParticle();
+			shootTimer -= deltaTime;
+		}
+		emitter->UpdateEmitterPosition(deltaTime);
+		emitter->Update(deltaTime);
 	}
 	else
 	{
@@ -444,6 +523,22 @@ void Game::Draw(float deltaTime, float totalTime)
 			// Finally do the actual drawing
 			context->DrawIndexed(entities[i]->GetMesh()->GetIndexCount(), 0, 0);
 		}
+
+		/***************************************************************/
+		// Particle states`																																														
+		float blend[4] = { 1,1,1,1 };
+		context->OMSetBlendState(particleBlendState, blend, 0xffffffff);  // Additive blending
+		context->OMSetDepthStencilState(particleDepthState, 0);			// No depth WRITING
+
+																		// Draw the emitter
+		emitter->Draw(context, camera);
+
+		// Reset to default states for next frame
+		context->OMSetBlendState(0, blend, 0xffffffff);
+		context->OMSetDepthStencilState(0, 0);
+
+
+		/******************************************************************/
 		const float color2[4] = {0.25f, 0.25f, 0.25f, 1.0f};
 		// Clear the render target and depth buffer (erases what's on the screen)
 		//  - Do this ONCE PER FRAME
