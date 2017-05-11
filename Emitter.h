@@ -56,6 +56,7 @@ public:
 	void Draw(ID3D11DeviceContext* context, Camera* camera);
 	void setParticleSpawn();
 	void UpdateEmitterPosition(float dt);
+	void UpdateEmitterVelocity();
 
 
 

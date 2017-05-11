@@ -21,6 +21,8 @@ public:
 	DirectX::XMFLOAT3 GetPosition() { return position; }
 	DirectX::XMFLOAT4X4 GetView() { return viewMatrix; }
 	DirectX::XMFLOAT4X4 GetProjection() { return projMatrix; }
+	DirectX::XMFLOAT3 cameraDirection;
+	
 
 private:
 	// Camera matrices
@@ -29,8 +31,9 @@ private:
 
 	// Transformations
 	DirectX::XMFLOAT3 startPosition;
-	DirectX::XMFLOAT3 position;
 	DirectX::XMFLOAT4 rotation;
+	DirectX::XMFLOAT3 position;
+	
 	float xRotation;
 	float yRotation;
 

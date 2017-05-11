@@ -99,6 +99,7 @@ Emitter::~Emitter()
 	delete[] localParticleVertices;
 	vertexBuffer->Release();
 	indexBuffer->Release();
+
 }
 
 void Emitter::setParticleSpawn() {
@@ -114,6 +115,20 @@ void Emitter::UpdateEmitterPosition(float dt)
 	if (GetAsyncKeyState('A') & 0x8000) { emitterPosition.x -= dt; }
 	if (GetAsyncKeyState('D') & 0x8000) { emitterPosition.x += dt; }
 }
+
+void Emitter::UpdateEmitterVelocity()
+{
+	/*XMFLOAT4 cameraRotation = cam->GetRotation();
+	XMVECTOR emitterRotation = XMLoadFloat4(&cameraRotation);*/
+	
+	XMVECTOR velocity = XMLoadFloat3(&particles->StartVelocity);
+	XMVECTOR camDir = XMLoadFloat3(&cam->cameraDirection);
+	XMVECTOR newVelocity = XMVector3Rotate(velocity,camDir );
+
+	XMStoreFloat3(&particles->StartVelocity, newVelocity);
+}
+
+
 
 //DirectX::XMFLOAT3 Emitter::GetEmitterPosition(float dt)
 //{

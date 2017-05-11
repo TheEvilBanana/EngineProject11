@@ -68,16 +68,24 @@ Game::~Game()
 	for (auto& m : meshes) delete m;
 	delete camera;
 	delete camera2;
+
+	//Clean up normal map stuff
 	metalSRV->Release();
 	normalSRV->Release();
 	sampler1->Release();
 
+	//clean up Skybox stuff
 	skySRV->Release();
 	rsSky->Release();
 	dsSky->Release();
+
+	//Clean Up UI stuff
 	playButtonTexture->Release();
 	quitButtonTexture->Release();
 	titleTexture->Release();
+	scoreTexture->Release();
+	backgroundTexture->Release();
+
 
 	delete world;
 	delete collisionConfig;
@@ -91,7 +99,7 @@ Game::~Game()
 	delete sphere;
 	delete sphereMotion;
 
-	//Particle Stuff
+	//Clean up Particle Stuff
 	particleTexture->Release();
 	particleBlendState->Release();
 	particleDepthState->Release();
@@ -118,15 +126,15 @@ void Game::Init()
 	spriteBatch.reset(new SpriteBatch(context));
 
 	//Import texture for loading
-	//CreateDDSTextureFromFile(device, L"Debug/TextureFiles/playpanel.dds", 0, &UITexture);
 	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/cyanplaypanel.png",0, &playButtonTexture);
 	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/cyanquitpanel.png", 0, &quitButtonTexture);
+	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/scoreUIBg.png", 0, &scoreTexture);
 
 	//Import texture for game title
 	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/asteroids.png", 0, &titleTexture);
 
-	////Import texture for the background
-	//CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/background.png", 0, &backgroundTexture);
+	//Import texture for the background
+	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/Background.png", 0, &backgroundTexture);
 
 	//Import particle texture
 	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/Shock.jpg", 0, &particleTexture);
@@ -171,7 +179,7 @@ void Game::Init()
 		particleTexture
 	);
 
-
+	//set up directional lights
 	dirLight1.SetLightValues(XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(0.0f, 0.0f, 1.0f, 1.0f), XMFLOAT3(1.0f, -1.0f, 0));
 	dirLight2.SetLightValues(XMFLOAT4(0.1f, 0.1f, 0.1f, 1.0f), XMFLOAT4(1.0f, 0.0f, 0.0f, 1.0f), XMFLOAT3(-1.0f, -1.0f, 0));
 	
@@ -231,6 +239,7 @@ void Game::LoadShaders()
 	if(!pixelShader->LoadShaderFile(L"Debug/PixelShader.cso"))	
 		pixelShader->LoadShaderFile(L"PixelShader.cso");
 
+	//Load Skybox vertex and pixel shaders
 	skyVS = new SimpleVertexShader(device, context);
 	if (!skyVS->LoadShaderFile(L"Debug/SkyVS.cso"))
 		skyVS->LoadShaderFile(L"SkyVS.cso");
@@ -239,6 +248,7 @@ void Game::LoadShaders()
 	if (!skyPS->LoadShaderFile(L"Debug/SkyPS.cso"))
 		skyPS->LoadShaderFile(L"SkyPS.cso");
 
+	//load particle vertex and pixel shaders
 	particleVS = new SimpleVertexShader(device, context);
 	if (!particleVS->LoadShaderFile(L"Debug/ParticleVS.cso"))
 		particleVS->LoadShaderFile(L"ParticleVS.cso");
@@ -250,9 +260,12 @@ void Game::LoadShaders()
 
 void Game::CreateMaterials()
 {
+	//import texture and normal map for asteroid
 	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/asteroid.tif", 0, &metalSRV);
 	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/asteroidNormalMap.tif", 0, &normalSRV);
-	CreateDDSTextureFromFile(device, L"Debug/TextureFiles/Star.dds", 0, &skySRV);
+
+	//import texture dds file for skybox
+	CreateDDSTextureFromFile(device, L"Debug/TextureFiles/Sky.dds", 0, &skySRV);
 
 	D3D11_SAMPLER_DESC sampleDesc = {};
 	sampleDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -392,7 +405,9 @@ void Game::Update(float deltaTime, float totalTime)
 			shootTimer -= deltaTime;
 		}
 		emitter->UpdateEmitterPosition(deltaTime);
+	
 		emitter->Update(deltaTime);
+		//emitter->UpdateEmitterVelocity();
 	}
 	else
 	{
@@ -448,35 +463,13 @@ void Game::Draw(float deltaTime, float totalTime)
 	switch (gameState)
 	{
 	case MainMenu:
-		////Draw the sky
-		//vertexBuffer = entities[2]->GetMesh()->GetVertexBuffer();
-		//indexBuffer = entities[2]->GetMesh()->GetIndexBuffer();
-
-		////Set the buffers in the input assembler
-		//context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-		//context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-
-		////Set up the sky shaders
-		//skyVS->SetMatrix4x4("view", camera->GetView());
-		//skyVS->SetMatrix4x4("projection", camera->GetProjection());
-		//skyVS->CopyAllBufferData();
-		//skyVS->SetShader();
-
-		//skyPS->SetShaderResourceView("Sky", skySRV);
-		//skyPS->CopyAllBufferData();
-		//skyPS->SetShader();
-
-		//context->RSSetState(rsSky);
-		//context->OMSetDepthStencilState(dsSky, 0);
-		//context->DrawIndexed(entities[2]->GetMesh()->GetIndexCount(), 0, 0);
-
-		//// Reset the render states we've changed
-		//context->RSSetState(0);
-		//context->OMSetDepthStencilState(0, 0);
-
+		
+		/************************************************************/
+		//Main screen UI
 		spriteBatch->Begin();
 
 		//Draw title, play and quit sprites
+		spriteBatch->Draw(backgroundTexture, XMFLOAT2(0,0));
 		spriteBatch->Draw(titleTexture, XMFLOAT2(300, 100));
 		spriteBatch->Draw(playButtonTexture, playSpritePosition);
 		spriteBatch->Draw(quitButtonTexture, quitSpritePosition);
@@ -513,6 +506,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		context->OMSetDepthStencilState(0, 0);
 		//*********************************************************//
 		
+		//Draw the actual asteroids objects.
 		for (int i = 0; i <= 1; i++) {
 			renderer.SetVertexBuffer(entities[i], vertexBuffer);
 			renderer.SetIndexBuffer(entities[i], indexBuffer);
@@ -537,8 +531,16 @@ void Game::Draw(float deltaTime, float totalTime)
 		context->OMSetBlendState(0, blend, 0xffffffff);
 		context->OMSetDepthStencilState(0, 0);
 
+		/*****************************************************************/
+
+		//Score UI
+		spriteBatch->Begin();
+		spriteBatch->Draw(scoreTexture, XMFLOAT2(width / 2 - 600, height / 2 - 350));
+		spriteBatch->End();
+
 
 		/******************************************************************/
+		//Mini Map
 		const float color2[4] = {0.25f, 0.25f, 0.25f, 1.0f};
 		// Clear the render target and depth buffer (erases what's on the screen)
 		//  - Do this ONCE PER FRAME

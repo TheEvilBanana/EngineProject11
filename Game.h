@@ -129,12 +129,13 @@ private:
 	//UI Stuff
 	std::unique_ptr<SpriteBatch> spriteBatch;
 	ID3D11ShaderResourceView* playButtonTexture;
+	ID3D11ShaderResourceView* scoreTexture;
 	XMFLOAT2 playSpritePosition = XMFLOAT2(500,300);
 	bool mouseAtPlay = false;
 	ID3D11ShaderResourceView* titleTexture;
 	ID3D11ShaderResourceView* quitButtonTexture;
 	XMFLOAT2 quitSpritePosition = XMFLOAT2(525, 500);
-	//ID3D11ShaderResourceView* backgroundTexture;
+	ID3D11ShaderResourceView* backgroundTexture;
 	bool mouseAtQuit = false;
 
 	//Game State Management

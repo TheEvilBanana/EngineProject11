@@ -25,6 +25,7 @@ void Camera::MoveRelative(float x, float y, float z) {
 	// Rotate the desired movement vector
 	XMVECTOR dir = XMVector3Rotate(XMVectorSet(x, y, z, 0), XMLoadFloat4(&rotation));
 
+	XMStoreFloat3(&cameraDirection, dir);
 	// Move in that direction
 	XMStoreFloat3(&position, XMLoadFloat3(&position) + dir);
 }
