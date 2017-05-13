@@ -88,6 +88,15 @@ Game::~Game()
 	scoreTexture->Release();
 	backgroundTexture->Release();
 
+	for (int i = 0; i < asteroids.size(); i++)
+	{
+		world->removeCollisionObject(asteroids[i]);
+		btMotionState* motionState = asteroids[i]->getMotionState();
+		btCollisionShape* shape = asteroids[i]->getCollisionShape();
+		delete asteroids[i];
+		delete shape;
+		delete motionState;
+	}
 
 	delete world;
 	delete collisionConfig;
@@ -100,7 +109,7 @@ Game::~Game()
 	delete planeMotion;
 	delete sphere;
 	delete sphereMotion;
-	for (auto& a : asteroids) delete a;
+	//for (auto& a : asteroids) delete a;
 
 	//Clean up Particle Stuff
 	particleTexture->Release();
