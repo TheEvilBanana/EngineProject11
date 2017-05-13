@@ -14,6 +14,8 @@
 #include "SpriteBatch.h"
 #include "SpriteFont.h"
 #include "Emitter.h"
+#include "btBulletCollisionCommon.h"
+#include "btBulletDynamicsCommon.h"
 
 
 class Game 
@@ -31,6 +33,7 @@ public:
 	void Update(float deltaTime, float totalTime);
 	void Draw(float deltaTime, float totalTime);
 	void Print();
+	btRigidBody* CreateAsteroid(float rad, float x, float y, float z, float mass);
 
 	// Overridden mouse input helper methods
 	void OnMouseDown (WPARAM buttonState, int x, int y);
@@ -124,7 +127,8 @@ private:
 	btSphereShape* sphere;
 	btMotionState* sphereMotion;
 
-
+	std::vector<btRigidBody*> asteroids;
+	std::vector<GameEntity*> astEntities;
 
 	//UI Stuff
 	std::unique_ptr<SpriteBatch> spriteBatch;

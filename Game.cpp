@@ -66,6 +66,8 @@ Game::~Game()
 
 	for (auto& e : entities) delete e;
 	for (auto& m : meshes) delete m;
+	
+	for (auto& ae : astEntities) delete ae;
 	delete camera;
 	delete camera2;
 
@@ -98,6 +100,7 @@ Game::~Game()
 	delete planeMotion;
 	delete sphere;
 	delete sphereMotion;
+	for (auto& a : asteroids) delete a;
 
 	//Clean up Particle Stuff
 	particleTexture->Release();
@@ -201,6 +204,11 @@ void Game::Init()
 	btRigidBody::btRigidBodyConstructionInfo infoPlane(0.0, planeMotion, plane);        // Set the info for the rigid body
 	planeBody = new btRigidBody(infoPlane);                                             // Initiate the rigid body
 	world->addRigidBody(planeBody);                                                     // Add body to world
+
+	for (int i = 0; i < 5; i++)
+	{
+		CreateAsteroid(1, 5+(i * 2), 5, 5, 1);
+	}
 
 	btTransform sphereTransform;                                                         // Same stuff for sphere as above
 	sphereTransform.setIdentity();
@@ -326,6 +334,16 @@ void Game::CreateBasicGeometry()
 	sphereEntity = new GameEntity(sphereMesh, material1);
 	entities.push_back(sphereEntity);
 
+	for (int i = 0; i < 5; i++)
+	{
+		GameEntity* ast = new GameEntity(sphereMesh, material1);
+		ast->SetScale(0.5, 0.5, 0.5);
+		astEntities.push_back(ast);
+		//delete ast;
+	}
+
+	printf("ast size:" + astEntities.size());
+
 	planeMesh = new Mesh("Debug/Models/cube.obj", device);
 	meshes.push_back(planeMesh);
 	planeEntity = new GameEntity(planeMesh, material1);
@@ -378,6 +396,16 @@ void Game::Update(float deltaTime, float totalTime)
 		sphereBody->getMotionState()->getWorldTransform(sphereSpace);
 
 		entities[0]->SetPosition(sphereSpace.getOrigin().x(), sphereSpace.getOrigin().y(), sphereSpace.getOrigin().z());
+		
+		for (int i = 0; i < astEntities.size(); i++)
+		{
+			btTransform astSpace;
+			asteroids[i]->getMotionState()->getWorldTransform(astSpace);
+			astEntities[i]->SetPosition(astSpace.getOrigin().x(), astSpace.getOrigin().y(), astSpace.getOrigin().z());
+
+			astEntities[i]->UpdateWorldMatrix();
+		}
+		
 		// Update the camera
 		camera->Update(deltaTime);
 		camera2->Update(deltaTime);
@@ -517,6 +545,18 @@ void Game::Draw(float deltaTime, float totalTime)
 			// Finally do the actual drawing
 			context->DrawIndexed(entities[i]->GetMesh()->GetIndexCount(), 0, 0);
 		}
+		//Asteroid spawning
+		for (int i = 0; i < asteroids.size(); i++)
+		{
+			renderer.SetVertexBuffer(astEntities[i], vertexBuffer);
+			renderer.SetIndexBuffer(astEntities[i], indexBuffer);
+			renderer.SetVertexShader(vertexShader, astEntities[i], camera);
+			renderer.SetPixelShader(pixelShader, astEntities[i], camera);
+			context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+			context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+			// Finally do the actual drawing
+			context->DrawIndexed(astEntities[i]->GetMesh()->GetIndexCount(), 0, 0);
+		}
 
 		/***************************************************************/
 		// Particle states`																																														
@@ -580,6 +620,25 @@ void Game::Draw(float deltaTime, float totalTime)
 void Game::Print()
 {
 	printf("Hello World");
+}
+
+btRigidBody* Game::CreateAsteroid(float rad, float x, float y, float z, float mass)
+{
+	btTransform sphereTransform;
+	sphereTransform.setIdentity();
+	sphereTransform.setOrigin(btVector3(x, y, z));
+	btSphereShape* sphere = new btSphereShape(rad);
+	btVector3 inertia(0, 0, 0);
+	if (mass != 0.0f)
+		sphere->calculateLocalInertia(mass, inertia);
+	btMotionState* motion = new btDefaultMotionState(sphereTransform);
+	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, sphere, inertia);
+	btRigidBody* body = new btRigidBody(info);
+	world->addRigidBody(body);
+	asteroids.push_back(body);
+	printf("Asteriod sphere created");
+	//delete body;
+	return body;
 }
 
 
