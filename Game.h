@@ -130,6 +130,9 @@ private:
 	std::vector<btRigidBody*> asteroids;
 	std::vector<GameEntity*> astEntities;
 
+	float testTimer = 0.0f;
+	bool testbool = true;
+
 	//UI Stuff
 	std::unique_ptr<SpriteBatch> spriteBatch;
 	ID3D11ShaderResourceView* playButtonTexture;

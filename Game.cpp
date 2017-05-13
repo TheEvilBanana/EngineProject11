@@ -219,6 +219,8 @@ void Game::Init()
 		CreateAsteroid(1, 5+(i * 2), 5, 5, 1);
 	}
 
+	asteroids[0]->setLinearVelocity(btVector3(-1, 0, 0));
+
 	btTransform sphereTransform;                                                         // Same stuff for sphere as above
 	sphereTransform.setIdentity();
 	sphereTransform.setOrigin(btVector3(0, 10, 0));
@@ -348,7 +350,6 @@ void Game::CreateBasicGeometry()
 		GameEntity* ast = new GameEntity(sphereMesh, material1);
 		ast->SetScale(0.5, 0.5, 0.5);
 		astEntities.push_back(ast);
-		//delete ast;
 	}
 
 	printf("ast size:" + astEntities.size());
@@ -413,6 +414,21 @@ void Game::Update(float deltaTime, float totalTime)
 			astEntities[i]->SetPosition(astSpace.getOrigin().x(), astSpace.getOrigin().y(), astSpace.getOrigin().z());
 
 			astEntities[i]->UpdateWorldMatrix();
+		}
+
+		testTimer += deltaTime;
+
+		if (testTimer > 5.0f && testbool)
+		{
+			testbool = false;
+			printf("removed");
+			world->removeRigidBody(asteroids[0]);
+		}
+
+		if (testTimer > 10.0f && !testbool)
+		{
+			testbool = true;
+			world->addRigidBody(asteroids[0]);
 		}
 		
 		// Update the camera
@@ -557,14 +573,18 @@ void Game::Draw(float deltaTime, float totalTime)
 		//Asteroid spawning
 		for (int i = 0; i < asteroids.size(); i++)
 		{
-			renderer.SetVertexBuffer(astEntities[i], vertexBuffer);
-			renderer.SetIndexBuffer(astEntities[i], indexBuffer);
-			renderer.SetVertexShader(vertexShader, astEntities[i], camera);
-			renderer.SetPixelShader(pixelShader, astEntities[i], camera);
-			context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
-			context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
-			// Finally do the actual drawing
-			context->DrawIndexed(astEntities[i]->GetMesh()->GetIndexCount(), 0, 0);
+			if (asteroids[i]->isInWorld())
+			{
+				renderer.SetVertexBuffer(astEntities[i], vertexBuffer);
+				renderer.SetIndexBuffer(astEntities[i], indexBuffer);
+				renderer.SetVertexShader(vertexShader, astEntities[i], camera);
+				renderer.SetPixelShader(pixelShader, astEntities[i], camera);
+				context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+				context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+				// Finally do the actual drawing
+				context->DrawIndexed(astEntities[i]->GetMesh()->GetIndexCount(), 0, 0);
+			}
+			
 		}
 
 		/***************************************************************/
