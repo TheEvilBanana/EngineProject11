@@ -34,6 +34,9 @@ public:
 	void Draw(float deltaTime, float totalTime);
 	void Print();
 	btRigidBody* CreateAsteroid(float rad, float x, float y, float z, float mass);
+	btRigidBody* CreateBulletPool(float rad, float x, float y, float z, float mass);
+
+	void AddBulletToWorld(int bulletNumber);
 
 	// Overridden mouse input helper methods
 	void OnMouseDown (WPARAM buttonState, int x, int y);
@@ -128,10 +131,16 @@ private:
 	btMotionState* sphereMotion;
 
 	std::vector<btRigidBody*> asteroids;
+	std::vector<btRigidBody*> bullets;
 	std::vector<GameEntity*> astEntities;
+	std::vector<GameEntity*> bulletEntities;
 
+	int bNum = 0;
+	int bulletTimer = 2.0f;
 	float testTimer = 0.0f;
 	bool testbool = true;
+	bool prevTab;
+	bool fire = false;
 
 	//UI Stuff
 	std::unique_ptr<SpriteBatch> spriteBatch;
