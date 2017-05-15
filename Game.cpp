@@ -219,7 +219,12 @@ void Game::Init()
 		CreateAsteroid(1, 5+(i * 2), 5, 5, 1);
 	}
 
-	asteroids[0]->setLinearVelocity(btVector3(-1, 0, 0));
+	for (int i = 0; i < 5; i++)
+	{
+		CreateBulletPool(1, 5, 5, 2, 1);
+	}
+
+	//asteroids[0]->setLinearVelocity(btVector3(-1, 0, 0));
 
 	btTransform sphereTransform;                                                         // Same stuff for sphere as above
 	sphereTransform.setIdentity();
@@ -351,7 +356,14 @@ void Game::CreateBasicGeometry()
 		astEntities.push_back(ast);
 	}
 
-	printf("ast size:" + astEntities.size());
+	for (int i = 0; i < 5; i++)
+	{
+		GameEntity* bul = new GameEntity(sphereMesh, material1);
+		bul->SetScale(0.25, 0.25, 0.25);
+		bulletEntities.push_back(bul);
+	}
+
+	//printf("ast size:" + astEntities.size());
 
 	planeMesh = new Mesh("Debug/Models/cube.obj", device);
 	meshes.push_back(planeMesh);
@@ -415,7 +427,16 @@ void Game::Update(float deltaTime, float totalTime)
 			astEntities[i]->UpdateWorldMatrix();
 		}
 
-		testTimer += deltaTime;
+		for (int i = 0; i < bulletEntities.size(); i++)
+		{
+			btTransform bulSpace;
+			bullets[i]->getMotionState()->getWorldTransform(bulSpace);
+			bulletEntities[i]->SetPosition(bulSpace.getOrigin().x(), bulSpace.getOrigin().y(), bulSpace.getOrigin().z());
+
+			bulletEntities[i]->UpdateWorldMatrix();
+		}
+
+		/*testTimer += deltaTime;
 
 		if (testTimer > 5.0f && testbool)
 		{
@@ -428,7 +449,7 @@ void Game::Update(float deltaTime, float totalTime)
 		{
 			testbool = true;
 			world->addRigidBody(asteroids[0]);
-		}
+		}*/
 		
 		// Update the camera
 		camera->Update(deltaTime);
@@ -445,6 +466,48 @@ void Game::Update(float deltaTime, float totalTime)
 		static bool isTabPressedLastFrame = false;
 		static float shootTimer = 0.0f;
 		bool isTabPressed = GetAsyncKeyState(VK_TAB);
+		bulletTimer -= deltaTime;
+		
+		bool currentTab = (GetAsyncKeyState('F') & 0x8000) != 0;
+		if (currentTab && !prevTab)
+		{
+			fire = !fire;
+			bNum++;
+
+			//if (bullets[bNum % 5]->isInWorld())
+			//{
+
+			//	btTransform bulSpace;
+			//	//bullets[bNum%5]->getMotionState()->getWorldTransform(bulSpace);
+
+			//	bulSpace.setOrigin(btVector3(0, 3, 0));
+
+			//	bullets[bNum % 5]->getMotionState()->setWorldTransform(bulSpace);
+
+			//	bulletEntities[bNum % 5]->SetPosition(bulSpace.getOrigin().x(), bulSpace.getOrigin().y(), bulSpace.getOrigin().z());
+
+			//	bulletEntities[bNum % 5]->UpdateWorldMatrix();
+			//}
+		}
+			
+		prevTab = currentTab;
+		
+		if (fire)
+		{
+			
+			if (!(bullets[bNum % 5]->isInWorld()))
+				AddBulletToWorld(bNum % 5);
+			
+			//bNum++;
+		}
+
+		
+		if (isTabPressed && bulletTimer <= 0.0f)
+		{
+			
+			bulletTimer = 2.0f;
+		}
+
 		if (!isTabPressedLastFrame && isTabPressed && shootTimer <= 0.0f)
 		{
 			shootTimer = 0.1f;
@@ -454,6 +517,9 @@ void Game::Update(float deltaTime, float totalTime)
 		if (shootTimer > 0.0f)
 		{
 			emitter->SpawnParticle();
+			
+			//AddBulletToWorld(0);
+			//bNum++;
 			shootTimer -= deltaTime;
 		}
 		emitter->UpdateEmitterPosition(deltaTime);
@@ -582,8 +648,23 @@ void Game::Draw(float deltaTime, float totalTime)
 				context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 				// Finally do the actual drawing
 				context->DrawIndexed(astEntities[i]->GetMesh()->GetIndexCount(), 0, 0);
+			}	
+		}
+
+		//Bullets
+		for (int i = 0; i < bullets.size(); i++)
+		{
+			if (bullets[i]->isInWorld())
+			{
+				renderer.SetVertexBuffer(bulletEntities[i], vertexBuffer);
+				renderer.SetIndexBuffer(bulletEntities[i], indexBuffer);
+				renderer.SetVertexShader(vertexShader, bulletEntities[i], camera);
+				renderer.SetPixelShader(pixelShader, bulletEntities[i], camera);
+				context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+				context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+				// Finally do the actual drawing
+				context->DrawIndexed(bulletEntities[i]->GetMesh()->GetIndexCount(), 0, 0);
 			}
-			
 		}
 
 		/***************************************************************/
@@ -686,6 +767,29 @@ btRigidBody* Game::CreateAsteroid(float rad, float x, float y, float z, float ma
 	printf("Asteriod sphere created");
 	//delete body;
 	return body;
+}
+
+btRigidBody * Game::CreateBulletPool(float rad, float x, float y, float z, float mass)
+{
+	btTransform sphereTransform;
+	sphereTransform.setIdentity();
+	sphereTransform.setOrigin(btVector3(x, y, z));
+	btSphereShape* sphere = new btSphereShape(rad);
+	btVector3 inertia(0, 0, 0);
+	if (mass != 0.0f)
+		sphere->calculateLocalInertia(mass, inertia);
+	btMotionState* motion = new btDefaultMotionState(sphereTransform);
+	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, sphere, inertia);
+	btRigidBody* body = new btRigidBody(info);
+	bullets.push_back(body);
+
+	return body;
+}
+
+void Game::AddBulletToWorld(int bulletNumber)
+{
+	world->addRigidBody(bullets[bulletNumber]);
+	bullets[bulletNumber]->setLinearVelocity(btVector3(0, 0, 1));
 }
 
 
