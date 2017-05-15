@@ -44,6 +44,32 @@ void Renderer::SetPixelShader(SimplePixelShader* &pixelShader, GameEntity* &game
 	pixelShader->SetShader();
 }
 
+void Renderer::SetPixelShaderMiniMap(SimplePixelShader *& pixelShader, GameEntity *& gameEntity, Camera *& camera, ID3D11ShaderResourceView * redSRV, XMFLOAT3 entityPos, Camera *& camera2)
+{
+	SetLights();
+	XMFLOAT3 difference;
+
+	difference.x = abs(camera2->GetPosition().x - entityPos.x);
+	difference.y = abs(camera2->GetPosition().y - entityPos.y);
+	difference.z = abs(camera2->GetPosition().z - entityPos.z);
+
+	pixelShader = gameEntity->GetMaterial()->GetPixelShader();
+	pixelShader->SetShaderResourceView("textureSRV", gameEntity->GetMaterial()->GetMaterialSRV());
+	pixelShader->SetShaderResourceView("normalMapSRV", gameEntity->GetMaterial()->GetNormalSRV());
+
+	if (difference.x < 5.0f && difference.y < 5.0f && difference.z < 5.0f) {
+		pixelShader->SetShaderResourceView("textureSRV", redSRV);
+	}
+
+	pixelShader->SetData("dirLight1", &dirLight1, sizeof(DirectionalLight));
+	pixelShader->SetData("dirLight2", &dirLight2, sizeof(DirectionalLight));
+
+	pixelShader->SetSamplerState("basicSampler", gameEntity->GetMaterial()->GetMaterialSampler());
+
+	pixelShader->CopyAllBufferData();
+	pixelShader->SetShader();
+}
+
 
 
 

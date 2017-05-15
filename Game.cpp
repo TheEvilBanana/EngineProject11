@@ -62,7 +62,7 @@ Game::~Game()
 	delete skyPS;
 	delete particleVS;
 	delete particlePS;
-
+	delete material2;
 
 	for (auto& e : entities) delete e;
 	for (auto& m : meshes) delete m;
@@ -71,10 +71,16 @@ Game::~Game()
 	delete camera;
 	delete camera2;
 
+	delete minimapPlayer;
+	delete minimapPlayerEntity;
+
 	//Clean up normal map stuff
 	metalSRV->Release();
 	normalSRV->Release();
 	sampler1->Release();
+
+	redSRV->Release();
+	yellowSRV->Release();
 
 	//clean up Skybox stuff
 	skySRV->Release();
@@ -87,6 +93,7 @@ Game::~Game()
 	titleTexture->Release();
 	scoreTexture->Release();
 	backgroundTexture->Release();
+
 
 	for (int i = 0; i < asteroids.size(); i++)
 	{
@@ -291,6 +298,9 @@ void Game::CreateMaterials()
 	//import texture dds file for skybox
 	CreateDDSTextureFromFile(device, L"Debug/TextureFiles/Sky.dds", 0, &skySRV);
 
+	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/red.jpg", 0, &redSRV);
+	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/yellow.jpg", 0, &yellowSRV);
+
 	D3D11_SAMPLER_DESC sampleDesc = {};
 	sampleDesc.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
 	sampleDesc.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
@@ -303,7 +313,7 @@ void Game::CreateMaterials()
 	//device->CreateSamplerState(&sampleDesc2, &sampler1);
 
 	material1 = new Material(pixelShader, vertexShader, metalSRV, normalSRV, sampler1);
-	//material2 = new Material(pixelShader, vertexShader, carpetSRV, sampler1);
+	material2 = new Material(pixelShader, vertexShader, yellowSRV, normalSRV, sampler1);
 
 	//Setting the sky stuff
 
@@ -376,6 +386,9 @@ void Game::CreateBasicGeometry()
 	cubeEntity = new GameEntity(cubeMesh, material1);
 	entities.push_back(cubeEntity);
 
+	minimapPlayer = new Mesh("Debug/Models/cube.obj", device);
+	minimapPlayerEntity = new GameEntity(minimapPlayer, material2);
+
 	entities[1]->SetScale(8.0f, 0.1f, 8.0f);
 }
 
@@ -436,7 +449,7 @@ void Game::Update(float deltaTime, float totalTime)
 			bulletEntities[i]->UpdateWorldMatrix();
 		}
 
-		/*testTimer += deltaTime;
+		//testTimer += deltaTime;
 
 		if (testTimer > 5.0f && testbool)
 		{
@@ -449,14 +462,19 @@ void Game::Update(float deltaTime, float totalTime)
 		{
 			testbool = true;
 			world->addRigidBody(asteroids[0]);
-		}*/
+		}
 		
+		XMFLOAT3 playerPos = camera->GetPosition();
+		minimapPlayerEntity->SetPosition(playerPos.x, playerPos.y, playerPos.z);
+
+
 		// Update the camera
 		camera->Update(deltaTime);
 		camera2->Update(deltaTime);
 
 		entities[0]->UpdateWorldMatrix();
 		entities[1]->UpdateWorldMatrix();
+		minimapPlayerEntity->UpdateWorldMatrix();
 
 		//Asteroid Movement
 		sphereEntity->Move(5.0f, 0.0f, 0);
@@ -703,11 +721,13 @@ void Game::Draw(float deltaTime, float totalTime)
 		UINT stride = sizeof(Vertex);
 		UINT offset = 0;
 		context->RSSetViewports(1, &viewportMiniMap);
+		XMFLOAT3 entityPos;
 		for (int i = 0; i <= 1; i++) {
+			entityPos = entities[i]->GetPosition();
 			renderer.SetVertexBuffer(entities[i], vertexBuffer);
 			renderer.SetIndexBuffer(entities[i], indexBuffer);
 			renderer.SetVertexShader(vertexShader, entities[i], camera2);
-			renderer.SetPixelShader(pixelShader, entities[i], camera2);
+			renderer.SetPixelShaderMiniMap(pixelShader, entities[i], camera2, redSRV, entityPos, camera);
 			context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
 			context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 			// Finally do the actual drawing
@@ -719,10 +739,11 @@ void Game::Draw(float deltaTime, float totalTime)
 		{
 			if (asteroids[i]->isInWorld())
 			{
+				entityPos = astEntities[i]->GetPosition();
 				renderer.SetVertexBuffer(astEntities[i], vertexBuffer);
 				renderer.SetIndexBuffer(astEntities[i], indexBuffer);
 				renderer.SetVertexShader(vertexShader, astEntities[i], camera2);
-				renderer.SetPixelShader(pixelShader, astEntities[i], camera2);
+				renderer.SetPixelShaderMiniMap(pixelShader, astEntities[i], camera2, redSRV, entityPos, camera);
 				context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
 				context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
 				// Finally do the actual drawing
@@ -731,6 +752,15 @@ void Game::Draw(float deltaTime, float totalTime)
 
 		}
 
+		entityPos = minimapPlayerEntity->GetPosition();
+		renderer.SetVertexBuffer(minimapPlayerEntity, vertexBuffer);
+		renderer.SetIndexBuffer(minimapPlayerEntity, indexBuffer);
+		renderer.SetVertexShader(vertexShader, minimapPlayerEntity, camera2);
+		renderer.SetPixelShader(pixelShader, minimapPlayerEntity, camera2);
+		context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+		context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+		// Finally do the actual drawing
+		context->DrawIndexed(minimapPlayerEntity->GetMesh()->GetIndexCount(), 0, 0);
 
 		}
 		break;

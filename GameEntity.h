@@ -25,7 +25,7 @@ public:
 	Mesh* GetMesh() { return mesh; }
 	Material* GetMaterial() { return material; }
 	DirectX::XMFLOAT4X4* GetWorldMatrix() { return &worldMatrix; }
-
+	XMFLOAT3 GetPosition();
 private:
 	
 

@@ -89,6 +89,7 @@ private:
 	Mesh* planeMesh;
 
 	Material *material1;
+	Material *material2;
 	
 	GameEntity *entity1;
 	GameEntity *entity2;
@@ -114,8 +115,11 @@ private:
 	ID3D11BlendState* particleBlendState;
 	Emitter* emitter;
 
-	
-	
+	//Minimap stuff
+	ID3D11ShaderResourceView* redSRV;
+	ID3D11ShaderResourceView* yellowSRV;
+	Mesh* minimapPlayer;
+	GameEntity* minimapPlayerEntity;
 
 	//bulletstuff
 	btDynamicsWorld* world;

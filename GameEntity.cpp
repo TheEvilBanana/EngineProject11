@@ -30,7 +30,10 @@ void GameEntity::UpdateWorldMatrix() {
 	XMStoreFloat4x4(&worldMatrix, XMMatrixTranspose(total));
 }
 
-
+XMFLOAT3 GameEntity::GetPosition()
+{
+	return position;
+}
 
 
 
