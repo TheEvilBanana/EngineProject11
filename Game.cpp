@@ -327,10 +327,9 @@ void Game::CreateMatrices()
 	camera = new Camera(0, 6, -15, true);
 	camera->UpdateProjectionMatrix((float) width / height);
 
-	camera2 = new Camera(0, 5, -15, false);
+	camera2 = new Camera(0, 50, 0, false);
 	camera2->UpdateProjectionMatrix((float) width / height);
-
-	camera2->Rotate(0, 0);
+	camera2->Rotate(1.5, 0);
 }
 
 
@@ -633,6 +632,25 @@ void Game::Draw(float deltaTime, float totalTime)
 			// Finally do the actual drawing
 			context->DrawIndexed(entities[i]->GetMesh()->GetIndexCount(), 0, 0);
 		}
+
+		//Asteroid spawning
+		for (int i = 0; i < asteroids.size(); i++)
+		{
+			if (asteroids[i]->isInWorld())
+			{
+				renderer.SetVertexBuffer(astEntities[i], vertexBuffer);
+				renderer.SetIndexBuffer(astEntities[i], indexBuffer);
+				renderer.SetVertexShader(vertexShader, astEntities[i], camera2);
+				renderer.SetPixelShader(pixelShader, astEntities[i], camera2);
+				context->IASetVertexBuffers(0, 1, &vertexBuffer, &stride, &offset);
+				context->IASetIndexBuffer(indexBuffer, DXGI_FORMAT_R32_UINT, 0);
+				// Finally do the actual drawing
+				context->DrawIndexed(astEntities[i]->GetMesh()->GetIndexCount(), 0, 0);
+			}
+
+		}
+
+
 		}
 		break;
 	case Exit:

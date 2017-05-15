@@ -1,16 +1,17 @@
 ﻿  Game.cpp
-d:\game design and development\sem 2\game engine design and development\engineproject11\packages\bullet\src\linearmath\btidebugdraw.h(169): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
-d:\game design and development\sem 2\game engine design and development\engineproject11\packages\bullet\src\linearmath\btidebugdraw.h(170): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
-d:\game design and development\sem 2\game engine design and development\engineproject11\packages\bullet\src\linearmath\btidebugdraw.h(171): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(14): warning C4005: 'max': macro redefinition
+d:\class stuff\game engine\engineproject11\packages\bullet\src\linearmath\btidebugdraw.h(169): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
+d:\class stuff\game engine\engineproject11\packages\bullet\src\linearmath\btidebugdraw.h(170): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
+d:\class stuff\game engine\engineproject11\packages\bullet\src\linearmath\btidebugdraw.h(171): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
+d:\class stuff\game engine\engineproject11\game.cpp(14): warning C4005: 'max': macro redefinition
   c:\program files (x86)\windows kits\8.1\include\shared\minwindef.h(193): note: see previous definition of 'max'
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(15): warning C4005: 'min': macro redefinition
+d:\class stuff\game engine\engineproject11\game.cpp(15): warning C4005: 'min': macro redefinition
   c:\program files (x86)\windows kits\8.1\include\shared\minwindef.h(197): note: see previous definition of 'min'
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(91): warning C4018: '<': signed/unsigned mismatch
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(219): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(410): warning C4018: '<': signed/unsigned mismatch
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(448): warning C4800: 'SHORT': forcing value to bool 'true' or 'false' (performance warning)
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(574): warning C4018: '<': signed/unsigned mismatch
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(607): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
-  EngineProject.vcxproj -> D:\Game Design and Development\Sem 2\Game Engine Design and Development\EngineProject11\Debug\EngineProject.exe
-  EngineProject.vcxproj -> D:\Game Design and Development\Sem 2\Game Engine Design and Development\EngineProject11\Debug\EngineProject.pdb (Full PDB)
+d:\class stuff\game engine\engineproject11\game.cpp(91): warning C4018: '<': signed/unsigned mismatch
+d:\class stuff\game engine\engineproject11\game.cpp(219): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+d:\class stuff\game engine\engineproject11\game.cpp(409): warning C4018: '<': signed/unsigned mismatch
+d:\class stuff\game engine\engineproject11\game.cpp(447): warning C4800: 'SHORT': forcing value to bool 'true' or 'false' (performance warning)
+d:\class stuff\game engine\engineproject11\game.cpp(573): warning C4018: '<': signed/unsigned mismatch
+d:\class stuff\game engine\engineproject11\game.cpp(606): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
+d:\class stuff\game engine\engineproject11\game.cpp(637): warning C4018: '<': signed/unsigned mismatch
+  EngineProject.vcxproj -> D:\Class Stuff\Game Engine\EngineProject11\Debug\EngineProject.exe
+  EngineProject.vcxproj -> D:\Class Stuff\Game Engine\EngineProject11\Debug\EngineProject.pdb (Full PDB)
