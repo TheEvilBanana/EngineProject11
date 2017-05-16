@@ -68,6 +68,7 @@ Game::~Game()
 	for (auto& m : meshes) delete m;
 	
 	for (auto& ae : astEntities) delete ae;
+	for (auto& b : bulletEntities) delete b;
 	delete camera;
 	delete camera2;
 
@@ -101,6 +102,16 @@ Game::~Game()
 		btMotionState* motionState = asteroids[i]->getMotionState();
 		btCollisionShape* shape = asteroids[i]->getCollisionShape();
 		delete asteroids[i];
+		delete shape;
+		delete motionState;
+	}
+
+	for (int i = 0; i < bullets.size(); i++)
+	{
+		world->removeCollisionObject(bullets[i]);
+		btMotionState* motionState = bullets[i]->getMotionState();
+		btCollisionShape* shape = bullets[i]->getCollisionShape();
+		delete bullets[i];
 		delete shape;
 		delete motionState;
 	}
