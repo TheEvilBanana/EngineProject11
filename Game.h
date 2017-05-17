@@ -32,13 +32,14 @@ public:
 	void OnResize();
 	void Update(float deltaTime, float totalTime);
 	void Draw(float deltaTime, float totalTime);
-	void Print();
 	btRigidBody* CreateAsteroid(float rad, float x, float y, float z, float mass);
-	btRigidBody* CreateBulletPool(float rad, float x, float y, float z, float mass);
+	btRigidBody* CreateBullets(float rad, float x, float y, float z, float mass);
 
 	void AddBulletToWorld(int bulletNumber);
-	void AddAsteroidToWorld(int astNumber);
 	void RemoveAsteriod(int astNumber);
+	
+	void AddAsteroidToWorld(int astNumber);
+	void RecycleBullets(int bulletNumber);
 
 	// Overridden mouse input helper methods
 	void OnMouseDown (WPARAM buttonState, int x, int y);
@@ -148,6 +149,7 @@ private:
 	float testTimer = 0.0f;
 	float addAsteroidTimer = 5.0f;
 	float asteroidDeathTimer = 10.0f;
+	float fireTimer = 3.0f;
 	bool testbool = true;
 	bool prevTab;
 	bool fire = false;

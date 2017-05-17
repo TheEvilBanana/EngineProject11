@@ -237,10 +237,10 @@ void Game::Init()
 		CreateAsteroid(1, 5+(i * 2), 5, 5, 1);
 	}
 
-	for (int i = 0; i < 5; i++)
+	/*for (int i = 0; i < 5; i++)
 	{
-		CreateBulletPool(1, 5, 5, 2, 1);
-	}
+		CreateBullets(1, 5, 5, 2, 1);
+	}*/
 
 	//asteroids[0]->setLinearVelocity(btVector3(-1, 0, 0));
 
@@ -377,12 +377,12 @@ void Game::CreateBasicGeometry()
 		astEntities.push_back(ast);
 	}
 
-	for (int i = 0; i < 5; i++)
+	/*for (int i = 0; i < 5; i++)
 	{
 		GameEntity* bul = new GameEntity(sphereMesh, material1);
 		bul->SetScale(0.25, 0.25, 0.25);
 		bulletEntities.push_back(bul);
-	}
+	}*/
 
 	//printf("ast size:" + astEntities.size());
 
@@ -442,6 +442,48 @@ void Game::Update(float deltaTime, float totalTime)
 
 		entities[0]->SetPosition(sphereSpace.getOrigin().x(), sphereSpace.getOrigin().y(), sphereSpace.getOrigin().z());
 		
+		addAsteroidTimer -= deltaTime;
+
+		float xPosition = rand() % 1;
+		if (rand() % 2 == 0)
+		{
+			xPosition = -xPosition;
+		}
+		float yPosition = rand() % 1;
+		if (rand() % 2 == 0)
+		{
+			yPosition = -yPosition;
+		}
+		float zPosition = rand() % 1;
+		if (rand() % 2 == 0)
+		{
+			zPosition = -zPosition;
+		}
+
+		if (addAsteroidTimer <= 0.0f)
+		{
+			GameEntity* ast = new GameEntity(sphereMesh, material1);
+			ast->SetScale(0.5, 0.5, 0.5);
+			astEntities.push_back(ast);
+
+			addAsteroidTimer = 5.0f;
+			CreateAsteroid(1, xPosition, yPosition, zPosition, 1.0);
+
+			asteroidCount++;
+		}
+
+		fireTimer -= deltaTime;
+
+		if (fireTimer <= 0.0f && (GetAsyncKeyState('F') & 0x8000))
+		{
+			GameEntity* bul = new GameEntity(sphereMesh, material1);
+			bul->SetScale(0.25, 0.25, 0.25);
+			bulletEntities.push_back(bul);
+			printf("bullet created");
+			fireTimer = 3.0f;
+			CreateBullets(0.25, 3, 3, 3, 1.0);
+		}
+
 		for (int i = 0; i < astEntities.size(); i++)
 		{
 			btTransform astSpace;
@@ -459,49 +501,21 @@ void Game::Update(float deltaTime, float totalTime)
 
 			bulletEntities[i]->UpdateWorldMatrix();
 		}
-
-		//testTimer += deltaTime;
-
-		if (testTimer > 5.0f && testbool)
-		{
-			testbool = false;
-			printf("removed");
-			world->removeRigidBody(asteroids[0]);
-		}
-
-		if (testTimer > 10.0f && !testbool)
-		{
-			testbool = true;
-			world->addRigidBody(asteroids[0]);
-		}
 		
 		XMFLOAT3 playerPos = camera->GetPosition();
 		minimapPlayerEntity->SetPosition(playerPos.x, playerPos.y, playerPos.z);
 
 		//5/16/2017
-		addAsteroidTimer -= deltaTime;
 		asteroidDeathTimer -= deltaTime;
-
-		if (addAsteroidTimer <= 0.0f)
-		{
-			addAsteroidTimer = 5.0f;
-			if(!(asteroids[asteroidCount]->isInWorld()))
-				AddAsteroidToWorld(asteroidCount);
-			asteroidCount++;
-			if (asteroidCount >= 5)
-			{
-				asteroidCount = 0;
-			}
-		}
 
 		if (asteroidDeathTimer <= 0.0f)
 		{
 			asteroidDeathTimer = 5.0f;
 			if (asteroids[asteroidDeathCounter]->isInWorld())
+			{
 				RemoveAsteriod(asteroidDeathCounter);
-			asteroidDeathCounter++;
-			if (asteroidDeathCounter >= 5)
-				asteroidDeathCounter = 0;
+				asteroidDeathCounter++;
+			}
 		}
 
 		// Update the camera
@@ -520,40 +534,27 @@ void Game::Update(float deltaTime, float totalTime)
 		static bool isTabPressedLastFrame = false;
 		static float shootTimer = 0.0f;
 		bool isTabPressed = GetAsyncKeyState(VK_TAB);
-		bulletTimer -= deltaTime;
 		
+
 		bool currentTab = (GetAsyncKeyState('F') & 0x8000) != 0;
 		if (currentTab && !prevTab)
 		{
 			fire = !fire;
-			bNum++;
 
-			//if (bullets[bNum % 5]->isInWorld())
-			//{
+			if (fire)
+				bNum++;
 
-			//	btTransform bulSpace;
-			//	//bullets[bNum%5]->getMotionState()->getWorldTransform(bulSpace);
-
-			//	bulSpace.setOrigin(btVector3(0, 3, 0));
-
-			//	bullets[bNum % 5]->getMotionState()->setWorldTransform(bulSpace);
-
-			//	bulletEntities[bNum % 5]->SetPosition(bulSpace.getOrigin().x(), bulSpace.getOrigin().y(), bulSpace.getOrigin().z());
-
-			//	bulletEntities[bNum % 5]->UpdateWorldMatrix();
-			//}
+			if (bNum >= 5)
+				bNum = 0;
 		}
 			
 		prevTab = currentTab;
 		
-		if (fire)
+		/*if (fire)
 		{
-			
-			if (!(bullets[bNum % 5]->isInWorld()))
-				AddBulletToWorld(bNum % 5);
-			
-			//bNum++;
-		}
+			if (!(bullets[bNum]->isInWorld()))
+				AddBulletToWorld(bNum);
+		}*/
 
 		
 		if (isTabPressed && bulletTimer <= 0.0f)
@@ -811,11 +812,6 @@ void Game::Draw(float deltaTime, float totalTime)
 	
 }
 
-void Game::Print()
-{
-	printf("Hello World");
-}
-
 btRigidBody* Game::CreateAsteroid(float rad, float x, float y, float z, float mass)
 {
 	btTransform sphereTransform;
@@ -828,14 +824,37 @@ btRigidBody* Game::CreateAsteroid(float rad, float x, float y, float z, float ma
 	btMotionState* motion = new btDefaultMotionState(sphereTransform);
 	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, sphere, inertia);
 	btRigidBody* body = new btRigidBody(info);
-	//world->addRigidBody(body);
+	world->addRigidBody(body);
+	
+	
+	float xSpeed = rand() % 3;
+	if (rand() % 2 == 0)
+	{
+		xSpeed = -xSpeed;
+	}
+	float ySpeed = rand() % 3;
+	if (rand() % 2 == 0)
+	{
+		ySpeed = -ySpeed;
+	}
+	float zSpeed = rand() % 3;
+	if (rand() % 2 == 0)
+	{
+		zSpeed = -zSpeed;
+	}
+
+	body->setLinearVelocity(btVector3(xSpeed, ySpeed, zSpeed));
+	
 	asteroids.push_back(body);
-	printf("Asteriod sphere created");
-	//delete body;
+
+	/*GameEntity* ast = new GameEntity(sphereMesh, material1);
+	ast->SetScale(0.5, 0.5, 0.5);
+	astEntities.push_back(ast);*/
+
 	return body;
 }
 
-btRigidBody * Game::CreateBulletPool(float rad, float x, float y, float z, float mass)
+btRigidBody * Game::CreateBullets(float rad, float x, float y, float z, float mass)
 {
 	btTransform sphereTransform;
 	sphereTransform.setIdentity();
@@ -847,8 +866,12 @@ btRigidBody * Game::CreateBulletPool(float rad, float x, float y, float z, float
 	btMotionState* motion = new btDefaultMotionState(sphereTransform);
 	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, sphere, inertia);
 	btRigidBody* body = new btRigidBody(info);
-	bullets.push_back(body);
+	world->addRigidBody(body);
 
+	body->setLinearVelocity(btVector3(0, 0, 10));
+
+	bullets.push_back(body);
+	
 	return body;
 }
 
@@ -876,14 +899,15 @@ void Game::AddAsteroidToWorld(int astNumber)
 		z = -z;
 	}
 
-	world->addRigidBody(asteroids[astNumber]);
+	//world->addRigidBody(asteroids[astNumber]);
 	asteroids[astNumber]->setLinearVelocity(btVector3(x, y, z));
 }
 
 void Game::RemoveAsteriod(int astNumber)
 {
-	asteroids[astNumber]->setLinearVelocity(btVector3(0, 0, 0));
 	world->removeRigidBody(asteroids[astNumber]);
+	/*asteroids[astNumber]->setLinearVelocity(btVector3(0, 0, 0));
+	
 
 	btTransform astSpace;
 	asteroids[astNumber]->getMotionState()->getWorldTransform(astSpace);
@@ -891,7 +915,21 @@ void Game::RemoveAsteriod(int astNumber)
 	asteroids[astNumber]->getMotionState()->setWorldTransform(astSpace);
 
 	astEntities[astNumber]->SetPosition(astSpace.getOrigin().x(), astSpace.getOrigin().y(), astSpace.getOrigin().z());
-	astEntities[astNumber]->UpdateWorldMatrix();
+	astEntities[astNumber]->UpdateWorldMatrix();*/
+}
+
+void Game::RecycleBullets(int bulletNumber)
+{
+	bullets[bulletNumber]->setLinearVelocity(btVector3(0, 0, 0));
+	world->removeRigidBody(bullets[bulletNumber]);
+
+	btTransform bulSpace;
+	bullets[bulletNumber]->getMotionState()->getWorldTransform(bulSpace);
+	bulSpace.setOrigin(btVector3(0, 3, -2));
+	bullets[bulletNumber]->getMotionState()->setWorldTransform(bulSpace);
+
+	bulletEntities[bulletNumber]->SetPosition(bulSpace.getOrigin().x(), bulSpace.getOrigin().y(), bulSpace.getOrigin().z());
+	bulletEntities[bulletNumber]->UpdateWorldMatrix();
 }
 
 

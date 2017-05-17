@@ -2,7 +2,7 @@
 d:\game design and development\sem 2\game engine design and development\engineproject11\packages\bullet\src\linearmath\btidebugdraw.h(169): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
 d:\game design and development\sem 2\game engine design and development\engineproject11\packages\bullet\src\linearmath\btidebugdraw.h(170): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
 d:\game design and development\sem 2\game engine design and development\engineproject11\packages\bullet\src\linearmath\btidebugdraw.h(171): warning C4305: 'argument': truncation from 'double' to 'const btScalar'
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.h(145): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
+d:\game design and development\sem 2\game engine design and development\engineproject11\game.h(146): warning C4244: 'initializing': conversion from 'float' to 'int', possible loss of data
 d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(14): warning C4005: 'max': macro redefinition
   c:\program files (x86)\windows kits\8.1\include\shared\minwindef.h(193): note: see previous definition of 'max'
 d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(15): warning C4005: 'min': macro redefinition
@@ -10,17 +10,22 @@ d:\game design and development\sem 2\game engine design and development\enginepr
 d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(99): warning C4018: '<': signed/unsigned mismatch
 d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(109): warning C4018: '<': signed/unsigned mismatch
 d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(237): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(445): warning C4018: '<': signed/unsigned mismatch
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(454): warning C4018: '<': signed/unsigned mismatch
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(522): warning C4800: 'SHORT': forcing value to bool 'true' or 'false' (performance warning)
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(523): warning C4244: '-=': conversion from 'float' to 'int', possible loss of data
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(562): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(693): warning C4018: '<': signed/unsigned mismatch
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(709): warning C4018: '<': signed/unsigned mismatch
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(741): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(774): warning C4018: '<': signed/unsigned mismatch
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(863): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(868): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
-d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(873): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(447): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(452): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(457): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(487): warning C4018: '<': signed/unsigned mismatch
+d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(496): warning C4018: '<': signed/unsigned mismatch
+d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(536): warning C4800: 'SHORT': forcing value to bool 'true' or 'false' (performance warning)
+d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(563): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(694): warning C4018: '<': signed/unsigned mismatch
+d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(710): warning C4018: '<': signed/unsigned mismatch
+d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(742): warning C4244: 'argument': conversion from 'unsigned int' to 'float', possible loss of data
+d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(775): warning C4018: '<': signed/unsigned mismatch
+d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(830): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(835): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(840): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(886): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(891): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
+d:\game design and development\sem 2\game engine design and development\engineproject11\game.cpp(896): warning C4244: 'initializing': conversion from 'int' to 'float', possible loss of data
   EngineProject.vcxproj -> D:\Game Design and Development\Sem 2\Game Engine Design and Development\EngineProject11\Debug\EngineProject.exe
   EngineProject.vcxproj -> D:\Game Design and Development\Sem 2\Game Engine Design and Development\EngineProject11\Debug\EngineProject.pdb (Full PDB)
