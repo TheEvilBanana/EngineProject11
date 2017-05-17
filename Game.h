@@ -37,6 +37,8 @@ public:
 	btRigidBody* CreateBulletPool(float rad, float x, float y, float z, float mass);
 
 	void AddBulletToWorld(int bulletNumber);
+	void AddAsteroidToWorld(int astNumber);
+	void RemoveAsteriod(int astNumber);
 
 	// Overridden mouse input helper methods
 	void OnMouseDown (WPARAM buttonState, int x, int y);
@@ -141,7 +143,11 @@ private:
 
 	int bNum = 0;
 	int bulletTimer = 2.0f;
+	int asteroidCount = 0;
+	int asteroidDeathCounter = 0;
 	float testTimer = 0.0f;
+	float addAsteroidTimer = 5.0f;
+	float asteroidDeathTimer = 10.0f;
 	bool testbool = true;
 	bool prevTab;
 	bool fire = false;

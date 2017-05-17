@@ -478,6 +478,31 @@ void Game::Update(float deltaTime, float totalTime)
 		XMFLOAT3 playerPos = camera->GetPosition();
 		minimapPlayerEntity->SetPosition(playerPos.x, playerPos.y, playerPos.z);
 
+		//5/16/2017
+		addAsteroidTimer -= deltaTime;
+		asteroidDeathTimer -= deltaTime;
+
+		if (addAsteroidTimer <= 0.0f)
+		{
+			addAsteroidTimer = 5.0f;
+			if(!(asteroids[asteroidCount]->isInWorld()))
+				AddAsteroidToWorld(asteroidCount);
+			asteroidCount++;
+			if (asteroidCount >= 5)
+			{
+				asteroidCount = 0;
+			}
+		}
+
+		if (asteroidDeathTimer <= 0.0f)
+		{
+			asteroidDeathTimer = 5.0f;
+			if (asteroids[asteroidDeathCounter]->isInWorld())
+				RemoveAsteriod(asteroidDeathCounter);
+			asteroidDeathCounter++;
+			if (asteroidDeathCounter >= 5)
+				asteroidDeathCounter = 0;
+		}
 
 		// Update the camera
 		camera->Update(deltaTime);
@@ -803,7 +828,7 @@ btRigidBody* Game::CreateAsteroid(float rad, float x, float y, float z, float ma
 	btMotionState* motion = new btDefaultMotionState(sphereTransform);
 	btRigidBody::btRigidBodyConstructionInfo info(mass, motion, sphere, inertia);
 	btRigidBody* body = new btRigidBody(info);
-	world->addRigidBody(body);
+	//world->addRigidBody(body);
 	asteroids.push_back(body);
 	printf("Asteriod sphere created");
 	//delete body;
@@ -830,7 +855,43 @@ btRigidBody * Game::CreateBulletPool(float rad, float x, float y, float z, float
 void Game::AddBulletToWorld(int bulletNumber)
 {
 	world->addRigidBody(bullets[bulletNumber]);
-	bullets[bulletNumber]->setLinearVelocity(btVector3(0, 0, 1));
+	bullets[bulletNumber]->setLinearVelocity(btVector3(0, 0, 10));
+}
+
+void Game::AddAsteroidToWorld(int astNumber)
+{
+	float x = rand() % 3;
+	if (rand() % 2 == 0)
+	{
+		x = -x;
+	}
+	float y = rand() % 3;
+	if (rand() % 2 == 0)
+	{
+		y = -y;
+	}
+	float z = rand() % 3;
+	if (rand() % 2 == 0)
+	{
+		z = -z;
+	}
+
+	world->addRigidBody(asteroids[astNumber]);
+	asteroids[astNumber]->setLinearVelocity(btVector3(x, y, z));
+}
+
+void Game::RemoveAsteriod(int astNumber)
+{
+	asteroids[astNumber]->setLinearVelocity(btVector3(0, 0, 0));
+	world->removeRigidBody(asteroids[astNumber]);
+
+	btTransform astSpace;
+	asteroids[astNumber]->getMotionState()->getWorldTransform(astSpace);
+	astSpace.setOrigin(btVector3(0, 5, 0));
+	asteroids[astNumber]->getMotionState()->setWorldTransform(astSpace);
+
+	astEntities[astNumber]->SetPosition(astSpace.getOrigin().x(), astSpace.getOrigin().y(), astSpace.getOrigin().z());
+	astEntities[astNumber]->UpdateWorldMatrix();
 }
 
 
