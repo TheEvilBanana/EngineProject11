@@ -19,6 +19,7 @@ public:
 
 	// Getters
 	DirectX::XMFLOAT3 GetPosition() { return position; }
+	DirectX::XMFLOAT4 GetRotation() { return rotation; }
 	DirectX::XMFLOAT4X4 GetView() { return viewMatrix; }
 	DirectX::XMFLOAT4X4 GetProjection() { return projMatrix; }
 	DirectX::XMFLOAT3 cameraDirection;
