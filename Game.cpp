@@ -94,6 +94,7 @@ Game::~Game()
 	titleTexture->Release();
 	scoreTexture->Release();
 	backgroundTexture->Release();
+	frameTexture->Release();
 
 
 	for (int i = 0; i < asteroids.size(); i++)
@@ -161,6 +162,7 @@ void Game::Init()
 	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/cyanplaypanel.png",0, &playButtonTexture);
 	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/cyanquitpanel.png", 0, &quitButtonTexture);
 	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/scoreUIBg.png", 0, &scoreTexture);
+	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/Frame.png", 0, &frameTexture);
 
 	//Import texture for game title
 	CreateWICTextureFromFile(device, context, L"Debug/TextureFiles/asteroids.png", 0, &titleTexture);
@@ -775,7 +777,9 @@ void Game::Draw(float deltaTime, float totalTime)
 		}
 
 		/***************************************************************/
-		// Particle states`																																														
+		// Particle states`	
+
+
 		float blend[4] = { 1,1,1,1 };
 		context->OMSetBlendState(particleBlendState, blend, 0xffffffff);  // Additive blending
 		context->OMSetDepthStencilState(particleDepthState, 0);			// No depth WRITING
@@ -797,6 +801,9 @@ void Game::Draw(float deltaTime, float totalTime)
 
 		/******************************************************************/
 		//Mini Map
+		spriteBatch->Begin();
+		spriteBatch->Draw(frameTexture, XMFLOAT2(width / 2 + 500, height / 2 + 250));
+		spriteBatch->End();
 		const float color2[4] = {0.25f, 0.25f, 0.25f, 1.0f};
 		// Clear the render target and depth buffer (erases what's on the screen)
 		//  - Do this ONCE PER FRAME

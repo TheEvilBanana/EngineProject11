@@ -172,6 +172,7 @@ private:
 	std::unique_ptr<SpriteBatch> spriteBatch;
 	ID3D11ShaderResourceView* playButtonTexture;
 	ID3D11ShaderResourceView* scoreTexture;
+	ID3D11ShaderResourceView* frameTexture;
 	XMFLOAT2 playSpritePosition = XMFLOAT2(500,300);
 	bool mouseAtPlay = false;
 	ID3D11ShaderResourceView* titleTexture;
