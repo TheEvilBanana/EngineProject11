@@ -26,6 +26,20 @@ public:
 	Game(HINSTANCE hInstance);
 	~Game();
 
+	struct asteroidObject
+	{
+		bool hit;
+		btRigidBody* body;
+		asteroidObject(btRigidBody* b) : body(b), hit(false) {}
+	};
+
+	struct bulletObject
+	{
+		bool hitbullet;
+		btRigidBody* bulletBody;
+		bulletObject(btRigidBody* b) : bulletBody(b), hitbullet(false) {}
+	};
+
 	// Overridden setup and game loop methods, which
 	// will be called automatically
 	void Init();
@@ -137,13 +151,13 @@ private:
 	btSphereShape* sphere;
 	btMotionState* sphereMotion;
 
-	std::vector<btRigidBody*> asteroids;
-	std::vector<btRigidBody*> bullets;
+	std::vector<asteroidObject*> asteroids;
+	std::vector<bulletObject*> bullets;
 	std::vector<GameEntity*> astEntities;
 	std::vector<GameEntity*> bulletEntities;
 
 	int bNum = 0;
-	int bulletTimer = 2.0f;
+	int bulletTimer  = 2.0f;
 	int asteroidCount = 0;
 	int asteroidDeathCounter = 0;
 	float testTimer = 0.0f;

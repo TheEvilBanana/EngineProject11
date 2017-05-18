@@ -98,22 +98,24 @@ Game::~Game()
 
 	for (int i = 0; i < asteroids.size(); i++)
 	{
-		world->removeCollisionObject(asteroids[i]);
-		btMotionState* motionState = asteroids[i]->getMotionState();
-		btCollisionShape* shape = asteroids[i]->getCollisionShape();
-		delete asteroids[i];
+		world->removeCollisionObject(asteroids[i]->body);
+		btMotionState* motionState = asteroids[i]->body->getMotionState();
+		btCollisionShape* shape = asteroids[i]->body->getCollisionShape();
+		delete asteroids[i]->body;
 		delete shape;
 		delete motionState;
+		delete asteroids[i];
 	}
 
 	for (int i = 0; i < bullets.size(); i++)
 	{
-		world->removeCollisionObject(bullets[i]);
-		btMotionState* motionState = bullets[i]->getMotionState();
-		btCollisionShape* shape = bullets[i]->getCollisionShape();
-		delete bullets[i];
+		world->removeCollisionObject(bullets[i]->bulletBody);
+		btMotionState* motionState = bullets[i]->bulletBody->getMotionState();
+		btCollisionShape* shape = bullets[i]->bulletBody->getCollisionShape();
+		delete bullets[i]->bulletBody;
 		delete shape;
 		delete motionState;
+		delete bullets[i];
 	}
 
 	delete world;
@@ -481,13 +483,13 @@ void Game::Update(float deltaTime, float totalTime)
 			bulletEntities.push_back(bul);
 			printf("bullet created");
 			fireTimer = 3.0f;
-			CreateBullets(0.25, 3, 3, 3, 1.0);
+			CreateBullets(0.25, 4, 5, 0, 1.0);
 		}
 
 		for (int i = 0; i < astEntities.size(); i++)
 		{
 			btTransform astSpace;
-			asteroids[i]->getMotionState()->getWorldTransform(astSpace);
+			asteroids[i]->body->getMotionState()->getWorldTransform(astSpace);
 			astEntities[i]->SetPosition(astSpace.getOrigin().x(), astSpace.getOrigin().y(), astSpace.getOrigin().z());
 
 			astEntities[i]->UpdateWorldMatrix();
@@ -496,7 +498,7 @@ void Game::Update(float deltaTime, float totalTime)
 		for (int i = 0; i < bulletEntities.size(); i++)
 		{
 			btTransform bulSpace;
-			bullets[i]->getMotionState()->getWorldTransform(bulSpace);
+			bullets[i]->bulletBody->getMotionState()->getWorldTransform(bulSpace);
 			bulletEntities[i]->SetPosition(bulSpace.getOrigin().x(), bulSpace.getOrigin().y(), bulSpace.getOrigin().z());
 
 			bulletEntities[i]->UpdateWorldMatrix();
@@ -511,7 +513,7 @@ void Game::Update(float deltaTime, float totalTime)
 		if (asteroidDeathTimer <= 0.0f)
 		{
 			asteroidDeathTimer = 5.0f;
-			if (asteroids[asteroidDeathCounter]->isInWorld())
+			if (asteroids[asteroidDeathCounter]->body->isInWorld())
 			{
 				RemoveAsteriod(asteroidDeathCounter);
 				asteroidDeathCounter++;
@@ -598,7 +600,57 @@ void Game::Update(float deltaTime, float totalTime)
 		[&]() { entities[0]->UpdateWorldMatrix(); },
 		[]() {printf("Hello World"); }
 	);*/
-	
+	int numManifolds = world->getDispatcher()->getNumManifolds();
+	for (int i = 0; i<numManifolds; i++)
+	{
+		btPersistentManifold* contactManifold = world->getDispatcher()->getManifoldByIndexInternal(i);
+		const btCollisionObject* obA = contactManifold->getBody0();
+		const btCollisionObject* obB = contactManifold->getBody1();
+		//btRigidBody* ob_A = (btRigidBody*)obA->getUserPointer();
+		//btRigidBody* ob_B = (btRigidBody*)obB->getUserPointer();
+		/* Check all contacts points */
+		int numContacts = contactManifold->getNumContacts();
+		for (int j = 0; j<numContacts; j++)
+		{
+			btManifoldPoint& pt = contactManifold->getContactPoint(j);
+			if (pt.getDistance()<0.f)
+			{
+				printf("contact!");
+				
+				((asteroidObject*)obA->getUserPointer())->hit = true;
+				((bulletObject*)obB->getUserPointer())->hitbullet = true;
+				//world->removeCollisionObject((btRigidBody*)obA->getUserPointer());
+				//world->removeCollisionObject(ob_B);
+				//btRigidBody* ob_A = (btRigidBody*)obA->getUserPointer();
+				//ob_A->setLinearVelocity(btVector3(0, 5, 0));
+				//world->removeRigidBody((btRigidBody*)obA->getUserPointer());
+				//break;
+				/*const btVector3& ptA = pt.getPositionWorldOnA();
+				const btVector3& ptB = pt.getPositionWorldOnB();
+				const btVector3& normalOnB = pt.m_normalWorldOnB;*/
+
+			}
+			//break;
+		}
+	}
+
+	for (int i = 0; i < asteroids.size(); i++)
+	{
+		if (asteroids[i]->hit)
+		{
+			asteroids[i]->body->setLinearVelocity(btVector3(0, 0, 0));
+			world->removeRigidBody(asteroids[i]->body);
+		}
+	}
+
+	for (int i = 0; i < bullets.size(); i++)
+	{
+		if (bullets[i]->hitbullet)
+		{
+			bullets[i]->bulletBody->setLinearVelocity(btVector3(0, 0, 0));
+			world->removeRigidBody(bullets[i]->bulletBody);
+		}
+	}
 	
 
 	// Quit if the escape key is pressed
@@ -693,7 +745,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		//Asteroid spawning
 		for (int i = 0; i < asteroids.size(); i++)
 		{
-			if (asteroids[i]->isInWorld())
+			if (asteroids[i]->body->isInWorld())
 			{
 				renderer.SetVertexBuffer(astEntities[i], vertexBuffer);
 				renderer.SetIndexBuffer(astEntities[i], indexBuffer);
@@ -709,7 +761,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		//Bullets
 		for (int i = 0; i < bullets.size(); i++)
 		{
-			if (bullets[i]->isInWorld())
+			if (bullets[i]->bulletBody->isInWorld())
 			{
 				renderer.SetVertexBuffer(bulletEntities[i], vertexBuffer);
 				renderer.SetIndexBuffer(bulletEntities[i], indexBuffer);
@@ -774,7 +826,7 @@ void Game::Draw(float deltaTime, float totalTime)
 		//Asteroid spawning
 		for (int i = 0; i < asteroids.size(); i++)
 		{
-			if (asteroids[i]->isInWorld())
+			if (asteroids[i]->body->isInWorld())
 			{
 				entityPos = astEntities[i]->GetPosition();
 				renderer.SetVertexBuffer(astEntities[i], vertexBuffer);
@@ -845,8 +897,8 @@ btRigidBody* Game::CreateAsteroid(float rad, float x, float y, float z, float ma
 
 	body->setLinearVelocity(btVector3(xSpeed, ySpeed, zSpeed));
 	
-	asteroids.push_back(body);
-
+	asteroids.push_back(new asteroidObject(body));
+	body->setUserPointer(asteroids[asteroids.size() - 1]);
 	/*GameEntity* ast = new GameEntity(sphereMesh, material1);
 	ast->SetScale(0.5, 0.5, 0.5);
 	astEntities.push_back(ast);*/
@@ -869,16 +921,16 @@ btRigidBody * Game::CreateBullets(float rad, float x, float y, float z, float ma
 	world->addRigidBody(body);
 
 	body->setLinearVelocity(btVector3(0, 0, 10));
-
-	bullets.push_back(body);
-	
+	bullets.push_back(new bulletObject(body));
+	body->setUserPointer(bullets[bullets.size() - 1]);
 	return body;
 }
 
+
 void Game::AddBulletToWorld(int bulletNumber)
 {
-	world->addRigidBody(bullets[bulletNumber]);
-	bullets[bulletNumber]->setLinearVelocity(btVector3(0, 0, 10));
+	world->addRigidBody(bullets[bulletNumber]->bulletBody);
+	bullets[bulletNumber]->bulletBody->setLinearVelocity(btVector3(0, 0, 10));
 }
 
 void Game::AddAsteroidToWorld(int astNumber)
@@ -900,12 +952,12 @@ void Game::AddAsteroidToWorld(int astNumber)
 	}
 
 	//world->addRigidBody(asteroids[astNumber]);
-	asteroids[astNumber]->setLinearVelocity(btVector3(x, y, z));
+	asteroids[astNumber]->body->setLinearVelocity(btVector3(x, y, z));
 }
 
 void Game::RemoveAsteriod(int astNumber)
 {
-	world->removeRigidBody(asteroids[astNumber]);
+	world->removeRigidBody(asteroids[astNumber]->body);
 	/*asteroids[astNumber]->setLinearVelocity(btVector3(0, 0, 0));
 	
 
@@ -920,13 +972,13 @@ void Game::RemoveAsteriod(int astNumber)
 
 void Game::RecycleBullets(int bulletNumber)
 {
-	bullets[bulletNumber]->setLinearVelocity(btVector3(0, 0, 0));
-	world->removeRigidBody(bullets[bulletNumber]);
+	bullets[bulletNumber]->bulletBody->setLinearVelocity(btVector3(0, 0, 0));
+	world->removeRigidBody(bullets[bulletNumber]->bulletBody);
 
 	btTransform bulSpace;
-	bullets[bulletNumber]->getMotionState()->getWorldTransform(bulSpace);
+	bullets[bulletNumber]->bulletBody->getMotionState()->getWorldTransform(bulSpace);
 	bulSpace.setOrigin(btVector3(0, 3, -2));
-	bullets[bulletNumber]->getMotionState()->setWorldTransform(bulSpace);
+	bullets[bulletNumber]->bulletBody->getMotionState()->setWorldTransform(bulSpace);
 
 	bulletEntities[bulletNumber]->SetPosition(bulSpace.getOrigin().x(), bulSpace.getOrigin().y(), bulSpace.getOrigin().z());
 	bulletEntities[bulletNumber]->UpdateWorldMatrix();
