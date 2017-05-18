@@ -4,7 +4,6 @@
 #include "DDSTextureLoader.h"
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
-#include <parallel_invoke.h>
 
 
 
@@ -13,6 +12,16 @@ using namespace DirectX;
 
 #define max(a,b) (((a) > (b)) ? (a):(b))
 #define min(a,b) (((a) < (b)) ? (a):(b))
+
+void boostTest1()
+{
+	printf("hello\n");
+}
+
+void boostTest2()
+{
+	printf("\t\tworld\n");
+}
 
 // --------------------------------------------------------
 // Constructor
@@ -439,6 +448,7 @@ void Game::Update(float deltaTime, float totalTime)
 	//Game State Management
 	if (mouseAtPlay)
 	{
+
 		gameState = GamePlay;
 		float sinTime = (sin(totalTime * 2) + 2.0f) / 10.0f;
 
@@ -448,6 +458,14 @@ void Game::Update(float deltaTime, float totalTime)
 
 		entities[0]->SetPosition(sphereSpace.getOrigin().x(), sphereSpace.getOrigin().y(), sphereSpace.getOrigin().z());
 		
+		
+
+		tgroup.create_thread(boost::bind(&boostTest1));
+		tgroup.create_thread(boost::bind(&boostTest2));
+
+		//tgroup.join_all();
+
+
 		addAsteroidTimer -= deltaTime;
 
 		float xPosition = rand() % 1;
@@ -466,6 +484,7 @@ void Game::Update(float deltaTime, float totalTime)
 			zPosition = -zPosition;
 		}
 
+		//Adding more asteroids in the game as time passes
 		if (addAsteroidTimer <= 0.0f)
 		{
 			GameEntity* ast = new GameEntity(sphereMesh, material1);
@@ -473,6 +492,7 @@ void Game::Update(float deltaTime, float totalTime)
 			astEntities.push_back(ast);
 
 			addAsteroidTimer = 5.0f;
+
 			CreateAsteroid(1, xPosition, yPosition, zPosition, 1.0);
 
 			asteroidCount++;
@@ -667,6 +687,8 @@ void Game::Update(float deltaTime, float totalTime)
 	// Quit if the escape key is pressed
 	if (GetAsyncKeyState(VK_ESCAPE))
 		Quit();
+
+	tgroup.join_all();
 }
 
 // --------------------------------------------------------

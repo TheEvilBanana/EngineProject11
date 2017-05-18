@@ -16,7 +16,8 @@
 #include "Emitter.h"
 #include "btBulletCollisionCommon.h"
 #include "btBulletDynamicsCommon.h"
-
+#include "boost\thread.hpp"
+#include "boost\bind.hpp"
 
 class Game 
 	: public DXCore
@@ -60,6 +61,9 @@ public:
 	void OnMouseUp	 (WPARAM buttonState, int x, int y);
 	void OnMouseMove (WPARAM buttonState, int x, int y);
 	void OnMouseWheel(float wheelDelta,   int x, int y);
+
+	boost::thread_group tgroup;
+
 private:
 
 	// Initialization helper methods - feel free to customize, combine, etc.
@@ -145,9 +149,12 @@ private:
 	btBroadphaseInterface* broadphase;
 	btConstraintSolver* solver;
 	btRigidBody* planeBody;
+	btRigidBody* planeBody1;
 	btRigidBody* sphereBody;
 	btStaticPlaneShape* plane;
+	btStaticPlaneShape* plane1;
 	btMotionState* planeMotion;
+	btMotionState* planeMotion1;
 	btSphereShape* sphere;
 	btMotionState* sphereMotion;
 
